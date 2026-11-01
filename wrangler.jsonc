@@ -1,0 +1,61 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "solid-print-test",
+  "main": "cloudflare/worker.js",
+  "account_id": "c7169e548c98e302627205cd397562c1",
+  "compatibility_date": "2026-11-01",
+  "compatibility_flags": [
+    "nodejs_compat",
+    "global_fetch_strictly_public"
+  ],
+  "workers_dev": false,
+  "preview_urls": false,
+  "assets": {
+    "directory": ".open-next/assets",
+    "binding": "ASSETS"
+  },
+  "routes": [
+    {
+      "pattern": "solidprint.emanuelwloch.pl",
+      "custom_domain": true
+    }
+  ],
+  "d1_databases": [
+    {
+      "binding": "D1",
+      "database_name": "solid-print-test",
+      "database_id": "3f6b7566-d013-4353-a29d-153fcb6fb752",
+      "migrations_dir": "migrations-d1"
+    }
+  ],
+  "r2_buckets": [
+    {
+      "binding": "PRIVATE_FILES",
+      "bucket_name": "solid-print-test-private"
+    },
+    {
+      "binding": "MEDIA",
+      "bucket_name": "solid-print-test-media"
+    }
+  ],
+  "vars": {
+    "PLATFORM": "cloudflare",
+    "NEXT_PUBLIC_SERVER_URL": "https://solidprint.emanuelwloch.pl",
+    "SITE_INDEXABLE": "false",
+    "ALLOW_SCHEMA_PUSH": "false"
+  },
+  "observability": {
+    "enabled": true,
+    "head_sampling_rate": 0.1
+  },
+  "ratelimits": [
+    {
+      "name": "FORM_LIMIT",
+      "namespace_id": "1001",
+      "simple": {
+        "limit": 20,
+        "period": 60
+      }
+    }
+  ]
+}

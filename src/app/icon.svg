@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
+  <rect width="64" height="64" rx="14" fill="#F6F4EF"/>
+  <!-- Uproszczony znak 3 warstw z Planszy 01 (16-64 px) -->
+  <rect x="10" y="14" width="44" height="9" rx="4.5" fill="#C2410C"/>
+  <rect x="10" y="27.5" width="44" height="9" rx="4.5" fill="#17191A"/>
+  <rect x="10" y="41" width="34" height="9" rx="4.5" fill="#17191A"/>
+</svg>

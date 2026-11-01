@@ -1,0 +1,16 @@
+import dotenv from 'dotenv'
+dotenv.config({quiet:true})
+const {getPayload}=await import('payload');const {default:config}=await import('../src/payload.config')
+const p=await getPayload({config});const s=await p.findGlobal({slug:'website',depth:0});const issues:string[]=[]
+for(const name of ['phone','email','sellerName','privacyText','termsText','cookiesText','aboutText'] as const)if(!s[name])issues.push(`Uzupełnij: ${name}`)
+if(!s.heroImage||!s.ownerImage)issues.push('Dodaj prawdziwe zdjęcie wydruku i właściciela.')
+if(!s.launchReady)issues.push('Właściciel musi potwierdzić sprawdzenie treści.')
+if(!(await p.count({collection:'users'})).totalDocs)issues.push('Utwórz konto właściciela.')
+if(!process.env.S3_ENDPOINT||process.env.STORAGE_MODE==='local')issues.push('Skonfiguruj produkcyjny prywatny magazyn S3.')
+if(!process.env.SMTP_HOST||['127.0.0.1','mailpit'].includes(process.env.SMTP_HOST))issues.push('Skonfiguruj produkcyjną pocztę SMTP i adres właściciela.')
+if(process.env.OWNER_EMAIL?.endsWith('.local'))issues.push('Zmień testowy adres właściciela.')
+if(process.env.ALLOW_SCHEMA_PUSH==='true')issues.push('Zastosuj migracje i wyłącz automatyczną zmianę schematu.')
+if(!process.env.NEXT_PUBLIC_SERVER_URL?.startsWith('https://'))issues.push('Skonfiguruj publiczny adres HTTPS.')
+if(issues.length){console.error('Publikacja wymaga uzupełnienia:\n'+issues.map(i=>'- '+i).join('\n'));process.exitCode=1}else console.log('Kontrola konfiguracji zakończona. Przed uruchomieniem wykonaj test SMTP, skanera i odtworzenia kopii na hostingu.')
+await p.destroy()
+process.exit(process.exitCode||0)

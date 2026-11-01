@@ -1,0 +1,17 @@
+node_modules/
+.next/
+.env
+.env.local
+*.tsbuildinfo
+.superpowers/
+artifacts/
+backups/
+.data/
+next-env.d.ts
+
+.wrangler/
+.open-next/
+.env.*
+!.env.example
+.dev.vars*
+.cloud-secrets*
