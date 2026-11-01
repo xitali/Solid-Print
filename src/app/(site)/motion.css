@@ -58,7 +58,7 @@
   transition: transform .4s var(--motion-button-ease);
 }
 .button-outline { background: transparent; border: 1px solid #334155; color: var(--ink); }
-.button-outline::before { background: var(--accent); }
+.button-outline::before { background: var(--paper); }
 .button:focus-visible::before { transform: translate3d(0, -101%, 0); }
 .button-outline:focus-visible { background: var(--accent); color: #fff; border-color: var(--accent); }
 .button:active { transform: translateY(1px); }

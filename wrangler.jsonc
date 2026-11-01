@@ -3,7 +3,7 @@
   "name": "solid-print-test",
   "main": "cloudflare/worker.js",
   "account_id": "c7169e548c98e302627205cd397562c1",
-  "compatibility_date": "2026-11-01",
+  "compatibility_date": "2026-10-30",
   "compatibility_flags": [
     "nodejs_compat",
     "global_fetch_strictly_public"

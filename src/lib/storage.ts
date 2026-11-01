@@ -9,7 +9,14 @@ export const localStorageEnabled=()=>process.env.STORAGE_MODE==='local'&&process
 export const s3=()=>new S3Client({endpoint:process.env.S3_ENDPOINT,region:process.env.S3_REGION||'us-east-1',forcePathStyle:true,credentials:{accessKeyId:process.env.S3_ACCESS_KEY!,secretAccessKey:process.env.S3_SECRET_KEY!}})
 const localPath=(key:string)=>{if(!/^quote\/[a-f0-9-]+$/.test(key))throw new Error('Invalid object key');return path.resolve('.data/objects',key)}
 export async function storeFile(key:string,filePath:string,size:number){
-  if(onCloudflare){const {PRIVATE_FILES}=await bindings();await PRIVATE_FILES.put(key,Readable.toWeb(createReadStream(filePath)) as unknown as import('@cloudflare/workers-types').ReadableStream,{httpMetadata:{contentType:'application/octet-stream'}});return}
+  if(onCloudflare){
+    const {PRIVATE_FILES}=await bindings()
+    // R2 requires a stream with a known byte length; a generic Node stream has none.
+    const {FixedLengthStream}=globalThis as unknown as {FixedLengthStream:new(size:number)=>{readable:import('@cloudflare/workers-types').ReadableStream;writable:WritableStream}}
+    const fixed=new FixedLengthStream(size), abort=new AbortController()
+    try{await Promise.all([PRIVATE_FILES.put(key,fixed.readable,{httpMetadata:{contentType:'application/octet-stream'}}),Readable.toWeb(createReadStream(filePath)).pipeTo(fixed.writable as never,{signal:abort.signal})])}finally{abort.abort()}
+    return
+  }
   if(localStorageEnabled()){const dest=localPath(key);await mkdir(path.dirname(dest),{recursive:true});await pipeline(createReadStream(filePath),createWriteStream(dest,{flags:'w',mode:0o600}));return}
   await s3().send(new PutObjectCommand({Bucket:process.env.S3_BUCKET,Key:key,Body:createReadStream(filePath),ContentLength:size,ContentType:'application/octet-stream'}))
 }

@@ -1,16 +1,19 @@
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { buildConfig, type CollectionConfig, type Field, type Access } from 'payload'
-import { postgresAdapter } from '@payloadcms/db-postgres'
-import { s3Storage } from '@payloadcms/storage-s3'
-import sharp from 'sharp'
 import { sqliteD1Adapter } from '@payloadcms/db-d1-sqlite'
 import { r2Storage } from '@payloadcms/storage-r2'
 import { onCloudflare, bindings } from './lib/cloudflare'
 import { pl } from '@payloadcms/translations/languages/pl'
-import { nodemailerAdapter } from '@payloadcms/email-nodemailer'
 
 const cloud = onCloudflare ? await bindings() : null
+// Native Node packages are loaded only by the local PostgreSQL deployment.
+const local = cloud ? null : {
+  postgresAdapter:(await import('@payloadcms/db-postgres')).postgresAdapter,
+  s3Storage:(await import('@payloadcms/storage-s3')).s3Storage,
+  nodemailerAdapter:(await import('@payloadcms/email-nodemailer')).nodemailerAdapter,
+  sharp:(await import('sharp')).default,
+}
 const dirname = path.dirname(fileURLToPath(import.meta.url))
 const owner: Access = ({ req }) => Boolean(req.user && req.user.role === 'owner')
 const published: Access = ({req}) => req.user ? true : { published: { equals: true } }
@@ -34,10 +37,10 @@ export default buildConfig({
   i18n:{fallbackLanguage:'pl',supportedLanguages:{pl}},
   admin:{user:'users',importMap:{baseDir:dirname},meta:{titleSuffix:' — Solid Print'},components:{graphics:{Logo:'/components/admin/Logo#Logo',Icon:'/components/admin/Logo#Icon'},beforeLogin:['/components/admin/Welcome#Welcome'],beforeDashboard:['/components/admin/Dashboard#Dashboard']}},
   typescript:{outputFile:path.resolve(dirname,'payload-types.ts')},
-  db:cloud ? sqliteD1Adapter({binding:cloud.D1, migrationDir:path.resolve(dirname,'migrations-d1'),push:false}) : postgresAdapter({pool:{connectionString:process.env.DATABASE_URL},push:process.env.ALLOW_SCHEMA_PUSH==='true'}),
-  ...(cloud ? {} : {sharp}),
+  db:cloud ? sqliteD1Adapter({binding:cloud.D1, migrationDir:path.resolve(dirname,'migrations-d1'),push:false}) : local!.postgresAdapter({pool:{connectionString:process.env.DATABASE_URL},push:process.env.ALLOW_SCHEMA_PUSH==='true'}),
+  ...(local ? {sharp:local.sharp} : {}),
   logger: cloud ? {options:{enabled:true},destination:{write:(line:string)=>console.log(line.trim())}} : undefined,
-  email:cloud ? (()=>({name:'unconfigured',defaultFromAddress:'noreply@solidprint.emanuelwloch.pl',defaultFromName:'Solid Print',sendEmail:async()=>{throw new Error('Poczta nie została jeszcze skonfigurowana.')}})) : nodemailerAdapter({defaultFromAddress:process.env.SMTP_FROM?.match(/<([^>]+)>/)?.[1]||'powiadomienia@solidprint.local',defaultFromName:'Solid Print',transportOptions:{host:process.env.SMTP_HOST||'127.0.0.1',port:Number(process.env.SMTP_PORT||51025),secure:process.env.SMTP_SECURE==='true',auth:process.env.SMTP_USER?{user:process.env.SMTP_USER,pass:process.env.SMTP_PASSWORD}:undefined}}),
+  email:cloud ? (()=>({name:'unconfigured',defaultFromAddress:'noreply@solidprint.emanuelwloch.pl',defaultFromName:'Solid Print',sendEmail:async()=>{throw new Error('Poczta nie została jeszcze skonfigurowana.')}})) : local!.nodemailerAdapter({defaultFromAddress:process.env.SMTP_FROM?.match(/<([^>]+)>/)?.[1]||'powiadomienia@solidprint.local',defaultFromName:'Solid Print',transportOptions:{host:process.env.SMTP_HOST||'127.0.0.1',port:Number(process.env.SMTP_PORT||51025),secure:process.env.SMTP_SECURE==='true',auth:process.env.SMTP_USER?{user:process.env.SMTP_USER,pass:process.env.SMTP_PASSWORD}:undefined}}),
   collections:[
     {slug:'users',labels:{singular:'Właściciel',plural:'Właściciele'},auth:{maxLoginAttempts:5,lockTime:600000},admin:{useAsTitle:'email',group:'Ustawienia'},access:{read:owner,create:owner,update:owner,delete:owner},fields:[{name:'name',label:'Imię',type:'text'},{name:'role',type:'select',defaultValue:'owner',required:true,options:[{label:'Właściciel',value:'owner'}],access:{update:()=>false}}]},
     {slug:'media',labels:{singular:'Zdjęcie',plural:'Zdjęcia'},admin:{group:'Treści strony'},access:{read:()=>true,create:owner,update:owner,delete:owner},upload:{staticDir:path.resolve('.data/public-media'),mimeTypes:['image/jpeg','image/png','image/webp'],...(cloud?{}:{imageSizes:[{name:'card' as const,width:800,height:600,position:'centre' as const}]})},fields:[{name:'alt',label:'Opis zdjęcia dla czytników ekranu',type:'text',required:true}]},
@@ -89,5 +92,5 @@ export default buildConfig({
       {label:'Dokumenty i publikacja',fields:[{name:'privacyText',label:'Polityka prywatności',type:'textarea'},{name:'termsText',label:'Zasady zamówień',type:'textarea'},{name:'cookiesText',label:'Informacje o cookies',type:'textarea'},{name:'launchReady',label:'Dane i dokumenty sprawdzone — gotowe do publikacji',type:'checkbox',defaultValue:false}]},
     ]},
   ]}],
-  plugins:cloud ? [r2Storage({bucket:cloud.MEDIA as unknown as Parameters<typeof r2Storage>[0]['bucket'],collections:{media:{prefix:'public-media'}}})] : process.env.S3_ENDPOINT ? [s3Storage({bucket:process.env.S3_BUCKET || 'solid-print-private',collections:{media:{prefix:'public-media'}},config:{endpoint:process.env.S3_ENDPOINT,region:process.env.S3_REGION||'us-east-1',forcePathStyle:true,credentials:{accessKeyId:process.env.S3_ACCESS_KEY!,secretAccessKey:process.env.S3_SECRET_KEY!}}})] : [],
+  plugins:cloud ? [r2Storage({bucket:cloud.MEDIA as unknown as Parameters<typeof r2Storage>[0]['bucket'],collections:{media:{prefix:'public-media'}}})] : process.env.S3_ENDPOINT ? [local!.s3Storage({bucket:process.env.S3_BUCKET || 'solid-print-private',collections:{media:{prefix:'public-media'}},config:{endpoint:process.env.S3_ENDPOINT,region:process.env.S3_REGION||'us-east-1',forcePathStyle:true,credentials:{accessKeyId:process.env.S3_ACCESS_KEY!,secretAccessKey:process.env.S3_SECRET_KEY!}}})] : [],
 })

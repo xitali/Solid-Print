@@ -484,8 +484,8 @@ p { color: var(--muted); }
   animation: sp-led-blink 1s ease-in-out infinite;
 }
 .status-led-done {
-  background: #10B981;
-  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.3);
+  background: var(--ink);
+  box-shadow: 0 0 0 3px rgba(23, 25, 26, 0.15);
 }
 @keyframes sp-led-blink {
   0%, 100% { opacity: 1; }
@@ -886,6 +886,8 @@ input:focus, textarea:focus, select:focus {
   .product-grid { grid-template-columns: 1fr 1fr; }
   .applications-layout { grid-template-columns: 1fr; gap: 40px; }
   .service-grid { grid-template-columns: 1fr; }
+  .process-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .process-grid:before { display: none; }
 }
 
 @media (max-width: 767px) {
@@ -920,7 +922,11 @@ input:focus, textarea:focus, select:focus {
     border-color: var(--accent);
     color: #FFFFFF;
   }
-  .product-grid { grid-template-columns: 1fr; }
+  .product-grid, .process-grid, .contact-grid, .workshop-grid, .two-column, .quote-layout, .application-grid { grid-template-columns: minmax(0, 1fr); }
+  .process-grid { gap: 32px; }
+  .process-node { margin-bottom: 12px; }
+  .section-title-row { align-items: flex-start; flex-direction: column; gap: 20px; }
+  .hero-buttons { flex-wrap: wrap; }
   .footer-grid { grid-template-columns: 1fr 1fr; }
 }
 
