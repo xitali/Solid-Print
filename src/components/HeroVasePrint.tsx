@@ -42,8 +42,8 @@ const stateOf = (i: number, l: number) =>
   l >= TOTAL_LAYERS ? 'cool' : i + 1 > l ? 'future' : i + 1 === l ? 'hot' : i + 1 >= l - 2 ? 'warm' : 'cool'
 
 export function HeroVasePrint({
-  material = 'PETG',
-  layerHeight = '0.20 MM',
+  material,
+  layerHeight,
 }: {
   material?: string
   layerHeight?: string
@@ -158,7 +158,7 @@ export function HeroVasePrint({
             <line x1="80" y1="384" x2="420" y2="384" />
             <line x1="80" y1="388" x2="420" y2="388" strokeDasharray="3 4" strokeWidth="1" stroke="#B0ACA0" />
             <text x="250" y="405" textAnchor="middle" fill="#8C887B" fontFamily="monospace" fontSize="9" letterSpacing="2">
-              STÓŁ ROBOCZY 220 × 220 MM · SYMULACJA
+              POLE ROBOCZE 340 × 320 MM · H 325 MM
             </text>
           </g>
 
@@ -234,7 +234,7 @@ export function HeroVasePrint({
               transform={`rotate(90 456 ${BASE_Y - 8 * LAYER_HEIGHT})`}
               textAnchor="middle"
             >
-              H: ~140 MM (PRZYKŁAD)
+              MODEL POGLĄDOWY
             </text>
           </g>
 
@@ -246,7 +246,7 @@ export function HeroVasePrint({
             <polygon points="124,424 130,421 130,427" fill="#5B605C" />
             <polygon points="376,424 370,421 370,427" fill="#5B605C" />
             <text x="250" y="435" fill="#5B605C" fontFamily="monospace" fontSize="9" textAnchor="middle">
-              Ø: ~85 MM (PRZYKŁAD)
+              SYMULACJA — BEZ SKALI
             </text>
           </g>
         </svg>
@@ -255,9 +255,9 @@ export function HeroVasePrint({
       {/* Dolny pasek parametrów wydruku */}
       <div className="vase-printer-footer mono">
         <div className="vase-tags">
-          <span className="tag-pill tag-pill-dark">{material}</span>
-          <span className="tag-pill">{layerHeight}</span>
-          <span className="tag-pill">DYSZA 0.4 MM</span>
+          {material && <span className="tag-pill tag-pill-dark">{material}</span>}
+          {layerHeight && <span className="tag-pill">{layerHeight}</span>}
+          <span className="tag-pill">DRUK WARSTWOWY FDM</span>
         </div>
         <button
           type="button"

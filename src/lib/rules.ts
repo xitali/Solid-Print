@@ -69,7 +69,7 @@ export function validateFiles(files: FileMeta[]): string[] {
 export function isValidNip(raw: string): boolean {
   const cleaned = raw.replace(/[\s-]/g, '')
   if (!cleaned) return true
-  if (!/^\d{10}$/.test(cleaned)) return false
+  if (!/^\d{10}$/.test(cleaned) || /^(\d)\1{9}$/.test(cleaned)) return false
   const weights = [6, 5, 7, 2, 3, 4, 5, 6, 7]
   let sum = 0
   for (let i = 0; i < 9; i++) {
@@ -91,7 +91,10 @@ export const inquirySchema = z.object({
   type: z.enum(['print', 'design', 'product', 'contact']),
   name: z.string().trim().min(2).max(100),
   email: z.email().max(254),
-  phone: z.string().trim().max(40).optional().default(''),
+  phone: z.string().trim().max(40).optional().default('')
+    .refine(v => !v || /^\+?[\d\s().-]+$/.test(v), 'Podaj poprawny numer telefonu.')
+    .transform(normalizePhone)
+    .refine(v => !v || /^\+?\d{7,15}$/.test(v), 'Numer telefonu musi mieć od 7 do 15 cyfr.'),
   company: z.string().trim().max(150).optional().default(''),
   nip: z
     .string()
@@ -99,6 +102,7 @@ export const inquirySchema = z.object({
     .max(30)
     .optional()
     .default('')
+    .transform(v => v.replace(/[\s-]/g, ''))
     .refine((val) => !val || isValidNip(val), {
       message: 'Podany NIP jest nieprawidłowy (sprawdź sumę kontrolną).',
     }),

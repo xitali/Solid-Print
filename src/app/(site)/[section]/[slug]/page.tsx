@@ -5,6 +5,7 @@ import { list } from '@/lib/cms'
 import { ProductDetails } from '@/components/ProductDetails'
 import { PageIntro, Paragraphs } from '@/components/UI'
 import { SectionLabel } from '@/components/Brand'
+import { StructuredData } from '@/components/StructuredData'
 import type { Product, Project, Article, Service, Material } from '@/lib/types'
 
 type Args = { params: Promise<{ section: string; slug: string }> }
@@ -31,6 +32,7 @@ export async function generateMetadata({ params }: Args) {
     title: d?.title || 'Nie znaleziono',
     description: d?.description || d?.result,
     alternates: { canonical: `/${section}/${slug}` },
+    openGraph:{title:d?.title,description:d?.description||d?.result,url:`/${section}/${slug}`,type:'website',images:d?.images?.[0]?.image?.url?[{url:d.images[0].image.url}]:undefined},
   }
 }
 
@@ -42,6 +44,7 @@ export default async function Page({ params }: Args) {
   if (section === 'projekty') {
     return (
       <div className="container page-content">
+        <StructuredData value={{'@context':'https://schema.org','@type':'Product',name:d.title,description:d.description,url:`${process.env.NEXT_PUBLIC_SERVER_URL}/projekty/${d.slug}`,image:d.images?.map(i=>i.image.url).filter(Boolean),...(typeof d.priceFrom==='number'?{offers:{'@type':'Offer',priceCurrency:'PLN',price:d.priceFrom,availability:d.available?'https://schema.org/PreOrder':'https://schema.org/OutOfStock'}}:{})}}/>
         <div className="breadcrumb">
           <Link href="/">Start</Link>
           <span>/</span>

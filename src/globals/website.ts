@@ -118,7 +118,7 @@ export const Website: GlobalConfig = {
               type: 'text',
               validate: (v: unknown) =>
                 !v ||
-                (typeof v === 'string' && /^https:\/\/(www\.)?facebook\.com\/[a-zA-Z0-9_.\/-]+$/.test(v)) ||
+                (typeof v === 'string' && /^https:\/\/(www\.)?facebook\.com\/[a-zA-Z0-9_./-]+$/.test(v)) ||
                 'Wpisz poprawny adres Facebook.',
             },
           ],

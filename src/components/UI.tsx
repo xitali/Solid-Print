@@ -1,6 +1,8 @@
 import Link from 'next/link'
+import { ViewTransition } from 'react'
 import { ArrowUpRight, Box, Plus, Upload, Check, Truck, Layers } from 'lucide-react'
 import { SectionLabel } from './Brand'
+import { StructuredData } from './StructuredData'
 import { FileLayersIcon, IdeaIcon, ProductBoxIcon } from './Icons'
 import type { FAQ, Product } from '@/lib/types'
 
@@ -162,6 +164,7 @@ export function Process() {
 export function FAQList({ items }: { items: FAQ[] }) {
   return (
     <div className="faq-list">
+      {items.length>0&&<StructuredData value={{'@context':'https://schema.org','@type':'FAQPage',mainEntity:items.map(f=>({'@type':'Question',name:f.question,acceptedAnswer:{'@type':'Answer',text:f.answer}}))}}/>}
       {items.map((f, i) => (
         <details key={f.id}>
           <summary>
@@ -181,9 +184,9 @@ export function ProductCard({ product: p }: { product: Product }) {
 
   return (
     <article className="product-card">
-      <Link href={`/projekty/${p.slug}`} className="product-visual corner-frame">
+      <ViewTransition name={`product-${p.id}`} default="none" share="sp-product"><Link href={`/projekty/${p.slug}`} className="product-visual corner-frame">
         {image?.url ? (
-          <img src={image.url} alt={image.alt || p.title} loading="lazy" />
+          <img src={image.url} alt={image.alt || p.title} width={image.width} height={image.height} decoding="async" loading="lazy" />
         ) : (
           <div className="product-no-image">
             <Box strokeWidth={0.8} size={64} />
@@ -196,7 +199,7 @@ export function ProductCard({ product: p }: { product: Product }) {
         <span className="product-arrow">
           <ArrowUpRight size={20} />
         </span>
-      </Link>
+      </Link></ViewTransition>
       <div className="product-info">
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <span className="mono muted">{p.category || 'PROJEKT 3D'}</span>

@@ -1,0 +1,21 @@
+[Unit]
+Description=Solid Print private ClamAV scanner
+After=network-online.target clamav-daemon.service
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=clamav
+Group=clamav
+EnvironmentFile=/etc/solidprint-scanner.env
+ExecStart=/usr/bin/node /opt/solidprint/scanner-agent.mjs
+TimeoutStartSec=300
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+MemoryMax=256M
+UMask=0077
+
+[Install]
+WantedBy=multi-user.target

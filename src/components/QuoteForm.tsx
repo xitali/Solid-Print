@@ -6,16 +6,13 @@ import dynamic from 'next/dynamic'
 import {
   ArrowUpRight,
   UploadCloud,
-  File,
   Trash2,
   Eye,
   RotateCw,
   CheckCircle2,
   AlertCircle,
-  HelpCircle,
   Info,
   Clock,
-  Sparkles,
   ShieldCheck,
 } from 'lucide-react'
 import { MODEL_EXTENSIONS, validateFiles, validateInquiry, previewEligibility, type FileMeta } from '@/lib/rules'
@@ -23,12 +20,13 @@ import type { Product, Material } from '@/lib/types'
 import { sendInquiry, SubmissionError, type SubmissionState, type SubmissionSession, type UploadItem } from '@/lib/submission'
 import { FileLayersIcon, IdeaIcon, ProductBoxIcon } from '@/components/Icons'
 import { consumePendingHeroFile } from '@/lib/hero-file-transfer'
+import { PrintLoader } from './PrintLoader'
 
 const ModelPreview = dynamic(() => import('./ModelPreview').then((m) => m.ModelPreview), {
   ssr: false,
   loading: () => (
     <div className="model-preview">
-      <div className="preview-message">Uruchamianie podglądu 3D…</div>
+      <div className="preview-message"><PrintLoader/>Uruchamianie podglądu 3D…</div>
     </div>
   ),
 })
@@ -284,7 +282,7 @@ export function QuoteForm({
           ? 'Dodaj przynajmniej jeden model do wydruku.'
           : parsed.error.issues.some((i) => i.path[0] === 'productId')
           ? 'Najpierw wybierz produkt z katalogu.'
-          : 'Sprawdź formularz: uzupełnij imię, poprawny e-mail, opis (minimum 10 znaków) oraz zaakceptuj prywatność.'
+          : parsed.error.issues.map(i=>i.message).join(' ')
       )
       return
     }
@@ -310,7 +308,7 @@ export function QuoteForm({
     return (
       <section className="submission-success form-card" role="status">
         <div className="submission-success__badge">
-          <CheckCircle2 size={46} strokeWidth={1.5} color="var(--accent)" />
+          <PrintLoader success />
         </div>
         <h2 tabIndex={-1}>Twój pomysł jest już u nas.</h2>
         <p className="submission-success__intro">

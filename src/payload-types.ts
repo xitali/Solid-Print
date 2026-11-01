@@ -67,19 +67,19 @@ export interface Config {
   };
   blocks: {};
   collections: {
+    inquiries: Inquiry;
     users: User;
-    media: Media;
+    'quote-files': QuoteFile;
+    'upload-sessions': UploadSession;
+    outbox: Outbox;
+    'rate-limits': RateLimit;
     products: Product;
+    media: Media;
     materials: Material;
     services: Service;
     projects: Project;
     articles: Article;
     faqs: Faq;
-    inquiries: Inquiry;
-    'quote-files': QuoteFile;
-    'upload-sessions': UploadSession;
-    outbox: Outbox;
-    'rate-limits': RateLimit;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -87,19 +87,19 @@ export interface Config {
   };
   collectionsJoins: {};
   collectionsSelect: {
+    inquiries: InquiriesSelect<false> | InquiriesSelect<true>;
     users: UsersSelect<false> | UsersSelect<true>;
-    media: MediaSelect<false> | MediaSelect<true>;
+    'quote-files': QuoteFilesSelect<false> | QuoteFilesSelect<true>;
+    'upload-sessions': UploadSessionsSelect<false> | UploadSessionsSelect<true>;
+    outbox: OutboxSelect<false> | OutboxSelect<true>;
+    'rate-limits': RateLimitsSelect<false> | RateLimitsSelect<true>;
     products: ProductsSelect<false> | ProductsSelect<true>;
+    media: MediaSelect<false> | MediaSelect<true>;
     materials: MaterialsSelect<false> | MaterialsSelect<true>;
     services: ServicesSelect<false> | ServicesSelect<true>;
     projects: ProjectsSelect<false> | ProjectsSelect<true>;
     articles: ArticlesSelect<false> | ArticlesSelect<true>;
     faqs: FaqsSelect<false> | FaqsSelect<true>;
-    inquiries: InquiriesSelect<false> | InquiriesSelect<true>;
-    'quote-files': QuoteFilesSelect<false> | QuoteFilesSelect<true>;
-    'upload-sessions': UploadSessionsSelect<false> | UploadSessionsSelect<true>;
-    outbox: OutboxSelect<false> | OutboxSelect<true>;
-    'rate-limits': RateLimitsSelect<false> | RateLimitsSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -144,6 +144,73 @@ export interface UserAuthOperations {
   };
 }
 /**
+ * Najnowsze zapytania na górze. Status zmieniasz w prawej kolumnie bocznej.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "inquiries".
+ */
+export interface Inquiry {
+  id: number;
+  history?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  status: 'new' | 'review' | 'quoted' | 'production' | 'closed' | 'rejected';
+  number?: string | null;
+  closedAt?: string | null;
+  idempotencyKey?: string | null;
+  sessionId?: string | null;
+  description?: string | null;
+  type?: ('print' | 'design' | 'product' | 'contact') | null;
+  quantity?: number | null;
+  deadline?: string | null;
+  material?: string | null;
+  color?: string | null;
+  unit?: string | null;
+  delivery?: string | null;
+  name?: string | null;
+  email?: string | null;
+  phone?: string | null;
+  company?: string | null;
+  nip?: string | null;
+  files?: (number | QuoteFile)[] | null;
+  notes?: string | null;
+  productSnapshot?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "quote-files".
+ */
+export interface QuoteFile {
+  id: number;
+  name: string;
+  size: number;
+  kind: 'model' | 'reference';
+  sessionId?: string | null;
+  objectKey?: string | null;
+  contentHash?: string | null;
+  status?: ('pending' | 'uploading' | 'quarantined' | 'clean' | 'infected') | null;
+  scanMessage?: string | null;
+  inquiryId?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "users".
  */
@@ -170,219 +237,6 @@ export interface User {
     | null;
   password?: string | null;
   collection: 'users';
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "media".
- */
-export interface Media {
-  id: number;
-  alt: string;
-  updatedAt: string;
-  createdAt: string;
-  url?: string | null;
-  thumbnailURL?: string | null;
-  filename?: string | null;
-  mimeType?: string | null;
-  filesize?: number | null;
-  width?: number | null;
-  height?: number | null;
-  focalX?: number | null;
-  focalY?: number | null;
-  sizes?: {
-    card?: {
-      url?: string | null;
-      width?: number | null;
-      height?: number | null;
-      mimeType?: string | null;
-      filesize?: number | null;
-      filename?: string | null;
-    };
-  };
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "products".
- */
-export interface Product {
-  id: number;
-  title: string;
-  slug: string;
-  description: string;
-  category?: string | null;
-  applications?:
-    | {
-        value: string;
-        id?: string | null;
-      }[]
-    | null;
-  material?: string | null;
-  dimensions?: string | null;
-  layerHeight?: string | null;
-  priceFrom?: number | null;
-  leadTime?: string | null;
-  personalization?: string | null;
-  available?: boolean | null;
-  featured?: boolean | null;
-  variants?:
-    | {
-        name: string;
-        color?: string | null;
-        id?: string | null;
-      }[]
-    | null;
-  images?:
-    | {
-        image: number | Media;
-        caption?: string | null;
-        id?: string | null;
-      }[]
-    | null;
-  published?: boolean | null;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "materials".
- */
-export interface Material {
-  id: number;
-  title: string;
-  slug: string;
-  description: string;
-  limitations?: string | null;
-  applications?:
-    | {
-        value: string;
-        id?: string | null;
-      }[]
-    | null;
-  colors?: string | null;
-  group?: ('decorative' | 'technical' | 'flexible' | 'outdoor') | null;
-  available?: boolean | null;
-  published?: boolean | null;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "services".
- */
-export interface Service {
-  id: number;
-  title: string;
-  slug: string;
-  description: string;
-  body?: string | null;
-  applications?: string | null;
-  relatedProjects?: (number | Project)[] | null;
-  kind: 'print' | 'design';
-  published?: boolean | null;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "projects".
- */
-export interface Project {
-  id: number;
-  title: string;
-  slug: string;
-  problem: string;
-  solution: string;
-  result: string;
-  image?: (number | null) | Media;
-  material?: string | null;
-  dimensions?: string | null;
-  published?: boolean | null;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "articles".
- */
-export interface Article {
-  id: number;
-  title: string;
-  slug: string;
-  description: string;
-  body: string;
-  image?: (number | null) | Media;
-  published?: boolean | null;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "faqs".
- */
-export interface Faq {
-  id: number;
-  question: string;
-  answer: string;
-  order?: number | null;
-  published?: boolean | null;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "inquiries".
- */
-export interface Inquiry {
-  id: number;
-  number?: string | null;
-  idempotencyKey?: string | null;
-  sessionId?: string | null;
-  type?: ('print' | 'design' | 'product' | 'contact') | null;
-  status?: ('new' | 'review' | 'quoted' | 'production' | 'closed' | 'rejected') | null;
-  name?: string | null;
-  email?: string | null;
-  phone?: string | null;
-  company?: string | null;
-  nip?: string | null;
-  material?: string | null;
-  color?: string | null;
-  unit?: string | null;
-  deadline?: string | null;
-  delivery?: string | null;
-  quantity?: number | null;
-  description?: string | null;
-  productSnapshot?:
-    | {
-        [k: string]: unknown;
-      }
-    | unknown[]
-    | string
-    | number
-    | boolean
-    | null;
-  files?: (number | QuoteFile)[] | null;
-  notes?: string | null;
-  closedAt?: string | null;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "quote-files".
- */
-export interface QuoteFile {
-  id: number;
-  name: string;
-  size: number;
-  kind: 'model' | 'reference';
-  sessionId?: string | null;
-  objectKey?: string | null;
-  contentHash?: string | null;
-  status?: ('pending' | 'uploading' | 'quarantined' | 'clean' | 'infected') | null;
-  scanMessage?: string | null;
-  inquiryId?: string | null;
-  updatedAt: string;
-  createdAt: string;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -425,6 +279,180 @@ export interface RateLimit {
   createdAt: string;
 }
 /**
+ * Katalog produktów i gotowych modeli 3D.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "products".
+ */
+export interface Product {
+  id: number;
+  /**
+   * Generuje się automatycznie z nazwy. Zmieniaj tylko w razie potrzeby.
+   */
+  slug: string;
+  published?: boolean | null;
+  title: string;
+  description: string;
+  category?: string | null;
+  available?: boolean | null;
+  featured?: boolean | null;
+  material?: string | null;
+  dimensions?: string | null;
+  layerHeight?: string | null;
+  priceFrom?: number | null;
+  leadTime?: string | null;
+  personalization?: string | null;
+  applications?:
+    | {
+        value: string;
+        id?: string | null;
+      }[]
+    | null;
+  variants?:
+    | {
+        name: string;
+        color?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  images?:
+    | {
+        image: number | Media;
+        caption?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "media".
+ */
+export interface Media {
+  id: number;
+  alt: string;
+  updatedAt: string;
+  createdAt: string;
+  url?: string | null;
+  thumbnailURL?: string | null;
+  filename?: string | null;
+  mimeType?: string | null;
+  filesize?: number | null;
+  width?: number | null;
+  height?: number | null;
+  focalX?: number | null;
+  focalY?: number | null;
+  sizes?: {
+    card?: {
+      url?: string | null;
+      width?: number | null;
+      height?: number | null;
+      mimeType?: string | null;
+      filesize?: number | null;
+      filename?: string | null;
+    };
+  };
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "materials".
+ */
+export interface Material {
+  id: number;
+  title: string;
+  /**
+   * Generuje się automatycznie z nazwy. Zmieniaj tylko w razie potrzeby.
+   */
+  slug: string;
+  description: string;
+  limitations?: string | null;
+  applications?:
+    | {
+        value: string;
+        id?: string | null;
+      }[]
+    | null;
+  colors?: string | null;
+  group?: ('decorative' | 'technical' | 'flexible' | 'outdoor') | null;
+  available?: boolean | null;
+  published?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "services".
+ */
+export interface Service {
+  id: number;
+  title: string;
+  /**
+   * Generuje się automatycznie z nazwy. Zmieniaj tylko w razie potrzeby.
+   */
+  slug: string;
+  description: string;
+  body?: string | null;
+  applications?: string | null;
+  relatedProjects?: (number | Project)[] | null;
+  kind: 'print' | 'design';
+  published?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "projects".
+ */
+export interface Project {
+  id: number;
+  title: string;
+  /**
+   * Generuje się automatycznie z nazwy. Zmieniaj tylko w razie potrzeby.
+   */
+  slug: string;
+  problem: string;
+  solution: string;
+  result: string;
+  image?: (number | null) | Media;
+  material?: string | null;
+  dimensions?: string | null;
+  published?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "articles".
+ */
+export interface Article {
+  id: number;
+  title: string;
+  /**
+   * Generuje się automatycznie z nazwy. Zmieniaj tylko w razie potrzeby.
+   */
+  slug: string;
+  description: string;
+  body: string;
+  image?: (number | null) | Media;
+  published?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "faqs".
+ */
+export interface Faq {
+  id: number;
+  question: string;
+  answer: string;
+  order?: number | null;
+  published?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
@@ -449,16 +477,36 @@ export interface PayloadLockedDocument {
   id: number;
   document?:
     | ({
+        relationTo: 'inquiries';
+        value: number | Inquiry;
+      } | null)
+    | ({
         relationTo: 'users';
         value: number | User;
       } | null)
     | ({
-        relationTo: 'media';
-        value: number | Media;
+        relationTo: 'quote-files';
+        value: number | QuoteFile;
+      } | null)
+    | ({
+        relationTo: 'upload-sessions';
+        value: number | UploadSession;
+      } | null)
+    | ({
+        relationTo: 'outbox';
+        value: number | Outbox;
+      } | null)
+    | ({
+        relationTo: 'rate-limits';
+        value: number | RateLimit;
       } | null)
     | ({
         relationTo: 'products';
         value: number | Product;
+      } | null)
+    | ({
+        relationTo: 'media';
+        value: number | Media;
       } | null)
     | ({
         relationTo: 'materials';
@@ -479,26 +527,6 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'faqs';
         value: number | Faq;
-      } | null)
-    | ({
-        relationTo: 'inquiries';
-        value: number | Inquiry;
-      } | null)
-    | ({
-        relationTo: 'quote-files';
-        value: number | QuoteFile;
-      } | null)
-    | ({
-        relationTo: 'upload-sessions';
-        value: number | UploadSession;
-      } | null)
-    | ({
-        relationTo: 'outbox';
-        value: number | Outbox;
-      } | null)
-    | ({
-        relationTo: 'rate-limits';
-        value: number | RateLimit;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -544,6 +572,36 @@ export interface PayloadMigration {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "inquiries_select".
+ */
+export interface InquiriesSelect<T extends boolean = true> {
+  history?: T;
+  status?: T;
+  number?: T;
+  closedAt?: T;
+  idempotencyKey?: T;
+  sessionId?: T;
+  description?: T;
+  type?: T;
+  quantity?: T;
+  deadline?: T;
+  material?: T;
+  color?: T;
+  unit?: T;
+  delivery?: T;
+  name?: T;
+  email?: T;
+  phone?: T;
+  company?: T;
+  nip?: T;
+  files?: T;
+  notes?: T;
+  productSnapshot?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "users_select".
  */
 export interface UsersSelect<T extends boolean = true> {
@@ -566,6 +624,101 @@ export interface UsersSelect<T extends boolean = true> {
         createdAt?: T;
         expiresAt?: T;
       };
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "quote-files_select".
+ */
+export interface QuoteFilesSelect<T extends boolean = true> {
+  name?: T;
+  size?: T;
+  kind?: T;
+  sessionId?: T;
+  objectKey?: T;
+  contentHash?: T;
+  status?: T;
+  scanMessage?: T;
+  inquiryId?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "upload-sessions_select".
+ */
+export interface UploadSessionsSelect<T extends boolean = true> {
+  tokenHash?: T;
+  expiresAt?: T;
+  ipHash?: T;
+  inquiryId?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "outbox_select".
+ */
+export interface OutboxSelect<T extends boolean = true> {
+  to?: T;
+  subject?: T;
+  text?: T;
+  state?: T;
+  attempts?: T;
+  nextAttemptAt?: T;
+  lastError?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "rate-limits_select".
+ */
+export interface RateLimitsSelect<T extends boolean = true> {
+  key?: T;
+  expiresAt?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "products_select".
+ */
+export interface ProductsSelect<T extends boolean = true> {
+  slug?: T;
+  published?: T;
+  title?: T;
+  description?: T;
+  category?: T;
+  available?: T;
+  featured?: T;
+  material?: T;
+  dimensions?: T;
+  layerHeight?: T;
+  priceFrom?: T;
+  leadTime?: T;
+  personalization?: T;
+  applications?:
+    | T
+    | {
+        value?: T;
+        id?: T;
+      };
+  variants?:
+    | T
+    | {
+        name?: T;
+        color?: T;
+        id?: T;
+      };
+  images?:
+    | T
+    | {
+        image?: T;
+        caption?: T;
+        id?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -598,47 +751,6 @@ export interface MediaSelect<T extends boolean = true> {
               filename?: T;
             };
       };
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "products_select".
- */
-export interface ProductsSelect<T extends boolean = true> {
-  title?: T;
-  slug?: T;
-  description?: T;
-  category?: T;
-  applications?:
-    | T
-    | {
-        value?: T;
-        id?: T;
-      };
-  material?: T;
-  dimensions?: T;
-  layerHeight?: T;
-  priceFrom?: T;
-  leadTime?: T;
-  personalization?: T;
-  available?: T;
-  featured?: T;
-  variants?:
-    | T
-    | {
-        name?: T;
-        color?: T;
-        id?: T;
-      };
-  images?:
-    | T
-    | {
-        image?: T;
-        caption?: T;
-        id?: T;
-      };
-  published?: T;
-  updatedAt?: T;
-  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -723,89 +835,6 @@ export interface FaqsSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "inquiries_select".
- */
-export interface InquiriesSelect<T extends boolean = true> {
-  number?: T;
-  idempotencyKey?: T;
-  sessionId?: T;
-  type?: T;
-  status?: T;
-  name?: T;
-  email?: T;
-  phone?: T;
-  company?: T;
-  nip?: T;
-  material?: T;
-  color?: T;
-  unit?: T;
-  deadline?: T;
-  delivery?: T;
-  quantity?: T;
-  description?: T;
-  productSnapshot?: T;
-  files?: T;
-  notes?: T;
-  closedAt?: T;
-  updatedAt?: T;
-  createdAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "quote-files_select".
- */
-export interface QuoteFilesSelect<T extends boolean = true> {
-  name?: T;
-  size?: T;
-  kind?: T;
-  sessionId?: T;
-  objectKey?: T;
-  contentHash?: T;
-  status?: T;
-  scanMessage?: T;
-  inquiryId?: T;
-  updatedAt?: T;
-  createdAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "upload-sessions_select".
- */
-export interface UploadSessionsSelect<T extends boolean = true> {
-  tokenHash?: T;
-  expiresAt?: T;
-  ipHash?: T;
-  inquiryId?: T;
-  updatedAt?: T;
-  createdAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "outbox_select".
- */
-export interface OutboxSelect<T extends boolean = true> {
-  to?: T;
-  subject?: T;
-  text?: T;
-  state?: T;
-  attempts?: T;
-  nextAttemptAt?: T;
-  lastError?: T;
-  updatedAt?: T;
-  createdAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "rate-limits_select".
- */
-export interface RateLimitsSelect<T extends boolean = true> {
-  key?: T;
-  expiresAt?: T;
-  updatedAt?: T;
-  createdAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv_select".
  */
 export interface PayloadKvSelect<T extends boolean = true> {
@@ -845,6 +874,8 @@ export interface PayloadMigrationsSelect<T extends boolean = true> {
   createdAt?: T;
 }
 /**
+ * Globalne ustawienia strony głównej, pracowni, kontaktu i dokumentów prawnych.
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "website".
  */

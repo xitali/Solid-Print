@@ -18,5 +18,52 @@ jobs:
           node-version: '24.22.1'
           cache: npm
       - run: npm ci
+      - run: npm run lint
+      - run: npm run typecheck
       - run: npm test
+      - run: npm run generate:types && git diff --exit-code -- src/payload-types.ts
+      - run: npm audit --omit=dev
+        continue-on-error: true
       - run: npm run cloud:build
+  integration:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    services:
+      postgres:
+        image: postgres:18
+        env:
+          POSTGRES_DB: solidprint
+          POSTGRES_USER: solidprint
+          POSTGRES_PASSWORD: ci-only-password
+        ports: ['55432:5432']
+        options: >-
+          --health-cmd pg_isready --health-interval 5s --health-timeout 5s --health-retries 10
+    env:
+      DATABASE_URL: postgres://solidprint:ci-only-password@127.0.0.1:55432/solidprint
+      PAYLOAD_SECRET: ci-only-secret-not-used-in-production-32-chars
+      NEXT_PUBLIC_SERVER_URL: http://127.0.0.1:3000
+      ALLOW_SCHEMA_PUSH: 'true'
+      LOCAL_DEVELOPMENT: 'true'
+      STORAGE_MODE: local
+      RUN_INTEGRATION: 'true'
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1
+        with:
+          node-version: '24.22.1'
+          cache: npm
+      - run: npm ci
+      - name: Uruchom serwer testowy
+        run: |
+          npm run dev > /tmp/solidprint-test.log 2>&1 &
+          for attempt in $(seq 1 60); do
+            if curl -fsS http://127.0.0.1:3000/api/health; then exit 0; fi
+            sleep 2
+          done
+          cat /tmp/solidprint-test.log
+          exit 1
+      - run: npm test
+      - run: npx playwright install --with-deps chromium
+      - run: npm run test:browser

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { validateFiles, validateInquiry, selectProducts, canDownload, previewEligibility } from '../src/lib/rules'
+import { validateFiles, validateInquiry, selectProducts, canDownload, previewEligibility, isValidNip } from '../src/lib/rules'
 
 describe('załączniki zapytania', () => {
   it('przyjmuje każdy format z planu, również wielkie litery', () => {
@@ -35,6 +35,13 @@ describe('trzy ścieżki klienta', () => {
   it('zapytanie produktowe wymaga identyfikatora produktu', () => {
     expect(validateInquiry({...base,type:'product'}).success).toBe(false)
     expect(validateInquiry({...base,type:'product',productId:'12'}).success).toBe(true)
+  })
+  it('normalizuje NIP i telefon, odrzuca fikcyjny NIP i niepoprawny telefon', () => {
+    const result = validateInquiry({...base,type:'design', nip:'526-025-09-95',phone:'+48 123 456 789'})
+    expect(result.success).toBe(true)
+    if(result.success) { expect(result.data.nip).toBe('5260250995'); expect(result.data.phone).toBe('+48123456789') }
+    expect(isValidNip('0000000000')).toBe(false)
+    expect(validateInquiry({...base,type:'design',phone:'abc'}).success).toBe(false)
   })
 })
 

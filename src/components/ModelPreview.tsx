@@ -18,6 +18,8 @@ export function ModelPreview({ file }: { file: File }) {
     let controls: OrbitControls | undefined
     let observer: ResizeObserver | undefined
     let visObserver: IntersectionObserver | undefined
+    let stopRendering = () => {}
+    let scan: THREE.Mesh<THREE.PlaneGeometry, THREE.MeshBasicMaterial> | undefined
 
     const worker = new Worker(new URL('../workers/model-parser.ts', import.meta.url), { type: 'module' })
     const timer = setTimeout(() => {
@@ -33,6 +35,7 @@ export function ModelPreview({ file }: { file: File }) {
     worker.onmessage = (event: MessageEvent) => {
       clearTimeout(timer)
       if (disposed) return
+      worker.terminate()
       if (event.data.error) {
         setMessage(event.data.error)
         return
@@ -102,7 +105,7 @@ export function ModelPreview({ file }: { file: File }) {
         const half = ((up === 'z' ? size.z : size.y) * scale) / 2 + 0.05
         const plane = new THREE.Plane(up === 'z' ? new THREE.Vector3(0, 0, -1) : new THREE.Vector3(0, -1, 0), -half)
         let sliceDone = reduce
-        let scan: THREE.Mesh | undefined
+
 
         if (!reduce) {
           renderer.localClippingEnabled = true
@@ -121,33 +124,54 @@ export function ModelPreview({ file }: { file: File }) {
           scene.add(scan)
         }
 
-        let inView = true
-        visObserver = new IntersectionObserver(
-          ([entry]) => {
-            inView = entry.isIntersecting
-          },
-          { threshold: 0.05 }
-        )
-        visObserver.observe(element)
-
-        const t0 = performance.now()
-        renderer.setAnimationLoop(() => {
-          if (!inView || document.hidden) return
+        let inView = false, frame = 0, elapsed = 0, last = performance.now()
+        let dragging = false
+        const schedule = () => {
+          if (!disposed && inView && !document.hidden && !frame) frame = requestAnimationFrame(render)
+        }
+        const render = (now: number) => {
+          frame = 0
+          if (disposed || !inView || document.hidden) return
+          elapsed += Math.min(now - last, 100); last = now
           if (!sliceDone && scan && material) {
-            const k = Math.min(1, (performance.now() - t0) / 2400)
-            const c = -half + k * 2 * half
-            plane.constant = c
-            scan.position[up] = c
-            if (k >= 1) {
+            const k = Math.min(1, elapsed / 2400)
+            plane.constant = -half + k * 2 * half
+            scan.position[up] = plane.constant
+            if (k === 1) {
               material.clippingPlanes = []
               material.needsUpdate = true
               scene.remove(scan)
               sliceDone = true
             }
           }
-          controls?.update()
+          const changed = controls?.update()
           renderer?.render(scene, camera)
+          if (!sliceDone || dragging || changed) schedule()
+        }
+        const resume = () => {
+          last = performance.now()
+          if (!inView || document.hidden) { cancelAnimationFrame(frame); frame = 0 }
+          else schedule()
+        }
+        controls.addEventListener('change', schedule)
+        controls.addEventListener('start', () => { dragging = true; schedule() })
+        controls.addEventListener('end', () => { dragging = false; schedule() })
+        document.addEventListener('visibilitychange', resume)
+        visObserver = new IntersectionObserver(([entry]) => { inView = entry.isIntersecting; resume() }, {threshold:0.05})
+        visObserver.observe(element)
+        observer.disconnect()
+        observer = new ResizeObserver(() => {
+          if (!renderer || !element.clientHeight) return
+          renderer.setSize(element.clientWidth, element.clientHeight)
+          camera.aspect = element.clientWidth / element.clientHeight
+          camera.updateProjectionMatrix()
+          schedule()
         })
+        observer.observe(element)
+        stopRendering = () => {
+          cancelAnimationFrame(frame)
+          document.removeEventListener('visibilitychange', resume)
+        }
 
         setMessage('')
       } catch {
@@ -155,11 +179,12 @@ export function ModelPreview({ file }: { file: File }) {
       }
     }
 
+    setMessage('Odczytywanie geometrii modelu…')
     file.arrayBuffer().then((buffer) => {
       if (!disposed) {
         worker.postMessage({ buffer, ext: file.name.split('.').pop()?.toLowerCase() }, [buffer])
       }
-    })
+    }).catch(() => { clearTimeout(timer); worker.terminate(); if(!disposed)setMessage('Nie udało się odczytać pliku. Możesz nadal przesłać go do wyceny.') })
 
     return () => {
       disposed = true
@@ -168,7 +193,9 @@ export function ModelPreview({ file }: { file: File }) {
       observer?.disconnect()
       visObserver?.disconnect()
       controls?.dispose()
-      renderer?.setAnimationLoop(null)
+      stopRendering()
+      scan?.geometry.dispose()
+      scan?.material.dispose()
       renderer?.dispose()
       renderer?.domElement.remove()
       geometry?.dispose()

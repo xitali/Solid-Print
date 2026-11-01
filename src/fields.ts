@@ -47,6 +47,7 @@ export const slugField: Field = {
   admin: {
     position: 'sidebar',
     description: 'Generuje się automatycznie z nazwy. Zmieniaj tylko w razie potrzeby.',
+    components: { Field:'/components/admin/SlugField#SlugField' },
   },
   hooks: {
     beforeValidate: [({ value, data }) => value || (data?.title ? slugify(String(data.title)) : value)],
@@ -54,7 +55,7 @@ export const slugField: Field = {
   validate: (value: unknown) =>
     typeof value === 'string' && /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(value)
       ? true
-      : 'Użyj małych liter bez polskich znaków, cyfr i myślników.',
+      : 'Użyj małych liter bez polskich znaków oraz cyfr i myślników.',
 }
 
 export const descriptionField: Field = {

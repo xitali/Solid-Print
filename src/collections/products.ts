@@ -17,6 +17,7 @@ export const Products: CollectionConfig = {
     useAsTitle: 'title',
     defaultColumns: ['title', 'category', 'priceFrom', 'available', 'published'],
     description: 'Katalog produktów i gotowych modeli 3D.',
+    preview:doc=>`${process.env.NEXT_PUBLIC_SERVER_URL||'http://127.0.0.1:3000'}/projekty/${doc.slug}`,
   },
   access: {
     read: published,

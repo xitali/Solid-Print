@@ -9,6 +9,8 @@ import { cms } from '@/lib/cms'
 import { guardOrigin,getSession,HttpError,errorResponse } from '@/lib/server'
 import { claimUpload } from '@/lib/database'
 import { storeFile } from '@/lib/storage'
+import {bindings,onCloudflare} from '@/lib/cloudflare'
+import {uploadR2} from '@/lib/upload-r2'
 export const runtime='nodejs'
 export const maxDuration=300
 export async function PUT(request:Request,{params}:{params:Promise<{id:string}>}){
@@ -19,6 +21,13 @@ export async function PUT(request:Request,{params}:{params:Promise<{id:string}>}
     if(!request.body)throw new HttpError(400,'Brak zawartości pliku.')
     if(['quarantined','clean'].includes(file.status!))return Response.json({ok:true,alreadyUploaded:true})
     if(!await claimUpload(p,id))throw new HttpError(409,'Ten plik jest już przesyłany lub został przesłany. Odczekaj chwilę przed ponowieniem.')
+    if(onCloudflare){
+      try{
+        const contentHash=await uploadR2(request.body,file.size,file.objectKey!,(await bindings()).PRIVATE_FILES)
+        await p.update({collection:'quote-files',id,data:{status:'quarantined',contentHash}})
+        return Response.json({ok:true})
+      }catch(error){await p.update({collection:'quote-files',id,data:{status:'pending'}});throw error}
+    }
     temp=await mkdtemp(path.join(tmpdir(),'solid-print-'));const dest=path.join(temp,'upload')
     const digest=createHash('sha256');let bytes=0;const limiter=new Transform({transform(chunk,_,cb){bytes+=chunk.length;digest.update(chunk);cb(bytes>file.size?new Error('Plik przekracza zadeklarowany rozmiar.'):null,chunk)}})
     try{

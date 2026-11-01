@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, ViewTransition } from 'react'
 import Link from 'next/link'
 import { Box, ArrowUpRight, X } from 'lucide-react'
 import type { Product } from '@/lib/types'
@@ -18,10 +18,10 @@ export function ProductDetails({ product: p }: { product: Product }) {
   return (
     <div className="detail-grid">
       <div>
-        <div className="product-gallery-main corner-frame">
+        <ViewTransition name={`product-${p.id}`} default="none" share="sp-product"><div className="product-gallery-main corner-frame">
           {image?.url ? (
             <button type="button" onClick={() => setExpanded(true)} aria-label="Powiększ zdjęcie produktu">
-              <img src={image.url} alt={image.alt || p.title} />
+              <img src={image.url} alt={image.alt || p.title} width={image.width} height={image.height} decoding="async" fetchPriority="high" />
             </button>
           ) : (
             <div className="product-no-image">
@@ -29,7 +29,7 @@ export function ProductDetails({ product: p }: { product: Product }) {
               <span className="mono">ZDJĘCIE NIE ZOSTAŁO JESZCZE DODANE</span>
             </div>
           )}
-        </div>
+        </div></ViewTransition>
         {images.length > 1 && (
           <div className="product-gallery-thumbs">
             {images.map((img, i) => (

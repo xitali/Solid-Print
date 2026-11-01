@@ -1,0 +1,12 @@
+node_modules
+.next
+.open-next
+.wrangler
+.data
+artifacts
+backups
+package-lock.json
+src/payload-types.ts
+src/migrations
+src/migrations-d1
+src/app/(payload)/admin/importMap.js

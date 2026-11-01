@@ -1,0 +1,12 @@
+.sp-admin-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr)); gap:16px; margin:20px 0; }
+.sp-admin-card { display:block; padding:20px; border:1px solid var(--theme-elevation-200); border-radius:10px; text-decoration:none; animation:sp-admin-enter .3s ease-out both; }
+.sp-admin-card strong { display:block; }
+.sp-admin-card b { display:block; font-size:32px; margin:8px 0; }
+.sp-admin-card small { display:block; color:var(--theme-elevation-700); }
+.sp-admin-card progress { width:100%; accent-color:var(--theme-elevation-800); }
+.sp-usage-warning,.sp-usage-full { border:2px solid #c2410c; }
+.sp-admin-notice { padding:16px; border-left:3px solid #c2410c; background:var(--theme-elevation-50); }
+.sp-operations { margin:32px 0; }
+.sp-product-snapshot { padding:16px; border:1px solid var(--theme-elevation-200); border-radius:8px; }
+@keyframes sp-admin-enter { from {opacity:0;transform:translateY(6px)} to {opacity:1;transform:none} }
+@media(prefers-reduced-motion:reduce) { .sp-admin-card { animation:none } }

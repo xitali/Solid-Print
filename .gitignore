@@ -5,6 +5,8 @@ node_modules/
 *.tsbuildinfo
 .superpowers/
 artifacts/
+test-results/
+.lighthouseci/
 backups/
 .data/
 next-env.d.ts

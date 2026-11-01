@@ -60,7 +60,7 @@
 .button-outline { background: transparent; border: 1px solid var(--line); color: var(--ink); }
 .button-outline::before { background: var(--paper); }
 .button:focus-visible::before { transform: translate3d(0, -101%, 0); }
-.button-outline:focus-visible { background: var(--accent); color: #fff; border-color: var(--accent); }
+.button-outline:focus-visible { background: var(--accent); color: var(--white); border-color: var(--accent); }
 .button:active { transform: translateY(1px); }
 
 .path-card,
@@ -88,7 +88,7 @@
 
 @media (hover: hover) and (pointer: fine) {
   .button:hover::before { transform: translate3d(0, -101%, 0); }
-  .button-outline:hover { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .button-outline:hover { background: var(--accent); color: var(--white); border-color: var(--accent); }
   .path-card:hover,
   .application-card:hover,
   .service-card:hover,
@@ -97,7 +97,7 @@
   .realization-card:hover { translate: 0 -5px; }
   .path-card:hover .path-cta > svg,
   .application-card:hover > svg:last-child { transform: translate(3px, -3px); }
-  .product-visual:hover .product-arrow { transform: rotate(45deg); background: var(--accent); color: #fff; }
+  .product-visual:hover .product-arrow { transform: rotate(45deg); background: var(--accent); color: var(--white); }
   .text-link:hover { background-size: 100% 2px; }
 }
 
@@ -129,10 +129,10 @@
   animation: sp-scan-line 1.6s ease-in-out .45s both;
 }
 @keyframes sp-scan-line {
-  0% { top: 12%; opacity: 0; }
+  0% { transform: translateY(0); opacity: 0; }
   20% { opacity: .6; }
   80% { opacity: .6; }
-  100% { top: 88%; opacity: 0; }
+  100% { transform: translateY(280px); opacity: 0; }
 }
 .art-stamp { animation: sp-stamp-in .7s var(--motion-ease) .6s both; }
 @keyframes sp-stamp-in {
@@ -148,7 +148,7 @@
 .layer-reveal.is-in { animation: sp-layer-reveal 1.1s steps(14, end) both; }
 .layer-reveal.is-in::after {
   content: ''; position: absolute; left: 0; right: 0; top: var(--reveal); height: 2px;
-  background: var(--light-accent, #FF8A5B); box-shadow: 0 0 12px var(--accent); pointer-events: none;
+  background: var(--light-accent, var(--light-accent)); box-shadow: 0 0 12px var(--accent); pointer-events: none;
   animation: sp-nozzle-fade 1.1s linear both;
 }
 @keyframes sp-layer-reveal { from { --reveal: 100%; } to { --reveal: 0%; } }
@@ -170,11 +170,29 @@
   @keyframes sp-scroll-progress { from { --progress: 100%; } to { --progress: 0%; } }
 }
 
+.print-loader { color:var(--accent); flex-shrink:0; }
+.print-loader-layer { transform-box:fill-box; transform-origin:center; animation:sp-print-layer .22s ease-out both; }
+@keyframes sp-print-layer { from {opacity:0;transform:scaleX(.2)} to {opacity:1;transform:scaleX(1)} }
+.submission-number { animation:sp-receipt .3s var(--motion-ease) .75s both; }
+@keyframes sp-receipt { from {opacity:0;transform:scale(1.07)} to {opacity:1;transform:scale(1)} }
+.process-grid.is-in::before { transform-origin:left; animation:sp-filament 1.1s var(--motion-ease) both; }
+.process-step.is-in .process-node > svg { animation:sp-print-layer .4s ease-out both; }
+@keyframes sp-filament { from {transform:scaleX(0)} to {transform:scaleX(1)} }
+.vase-layer { transform-box:fill-box; transform-origin:center; transition:transform .24s ease-out,opacity .2s; }
+.vase-layer[data-state='future'] { opacity:0; transform:scaleX(.7); }
+::view-transition-group(.sp-page) { animation-duration:160ms; }
+::view-transition-group(.sp-product) { animation-duration:300ms; }
+.btn { position:relative; isolation:isolate; overflow:hidden; }
+.btn--primary::before { content:''; position:absolute; inset:0; z-index:-1; background:var(--accent-hover); transform:translateY(101%); transition:transform .3s steps(6,end); }
+@media(hover:hover) and (pointer:fine) { .btn--primary:hover::before {transform:translateY(0)} }
 @media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(*),::view-transition-new(*) { animation:none !important; }
+  .hero-drifting-lines { transform:none !important; }
+  .layer-reveal img { clip-path:none; }
   html { scroll-behavior: auto; }
   *, *::before, *::after { animation: none !important; transition: none !important; }
   .button:hover::before, .button:focus-visible::before { transform: none; }
-  .button-outline:hover, .button-outline:focus-visible { color: #fff; background: var(--accent); }
+  .button-outline:hover, .button-outline:focus-visible { color: var(--white); background: var(--accent); }
   .path-card:hover, .application-card:hover, .service-card:hover,
   .material-card:hover, .article-card:hover, .realization-card:hover { translate: none; }
   .art-stamp { transform: rotate(-5deg); }

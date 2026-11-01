@@ -5,7 +5,6 @@ import { Pathways, Process, ProductCard, FAQList, Paragraphs } from '@/component
 import { HeroDropZone } from '@/components/HeroDropZone'
 import {
   FileLayersIcon,
-  IdeaIcon,
   ProductBoxIcon,
   RulerIcon,
   BatchIcon,
@@ -14,6 +13,7 @@ import {
   InstagramIcon,
 } from '@/components/Icons'
 import { ContactForm } from '@/components/ContactForm'
+import { StructuredData } from '@/components/StructuredData'
 import { list, website } from '@/lib/cms'
 import type { Product, Project, FAQ, Article } from '@/lib/types'
 
@@ -30,6 +30,7 @@ export default async function Home() {
 
   return (
     <>
+      {s.sellerName&&<StructuredData value={{'@context':'https://schema.org','@type':'LocalBusiness',name:s.sellerName,url:process.env.NEXT_PUBLIC_SERVER_URL,...(s.email?{email:s.email}:{}),...(s.phone?{telephone:s.phone}:{}),sameAs:[s.instagram,s.facebook].filter(Boolean)}}/>}
       {/* HERO (Plansza 03 — MOTYW I KOMPONENTY + animowany wazon) */}
       <section className="hero">
         <div className="hero-drifting-lines" aria-hidden="true" />

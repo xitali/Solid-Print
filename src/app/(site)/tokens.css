@@ -1,0 +1,37 @@
+/* Current palette: paper / graphite / orange. */
+:root {
+  --paper: #F6F4EF;
+  --white: #FFFFFF;
+  --ink: #17191A;
+  --charcoal: #1C1B19;    /* CIEPŁY WĘGIEL */
+  --ink-soft: #5B605C;
+  --muted: #5B605C;
+  --line: #E3DFD5;        /* RAMKI I LINIE */
+  --accent: #C2410C;      /* AKCENT POMARAŃCZ */
+  --accent-hover: #9A3412;
+  --light-accent: #FF8A5B; /* NA CIEMNYM */
+  --yellow: #F2C14E;      /* WYRÓŻNIK */
+  --danger: #B42318;
+  --tone-a09e96: #a09e96;
+  --tone-eceae1: #eceae1;
+  --tone-e6e3d8: #e6e3d8;
+  --tone-b0aca0: #b0aca0;
+  --tone-b9b5a8: #b9b5a8;
+  --tone-fff5f5: #fff5f5;
+  --tone-faf8f3: #faf8f3;
+  --tone-383d3a: #383d3a;
+  --tone-a8a296: #a8a296;
+  --tone-fff3eb: #fff3eb;
+  --tone-fffbeb: #fffbeb;
+  --tone-fcd34d: #fcd34d;
+  --tone-78350f: #78350f;
+  --tone-26231f: #26231f;
+  --tone-151413: #151413;
+  --tone-ff8a8a: #ff8a8a;
+  --tone-f0fdf4: #f0fdf4;
+  --tone-166534: #166534;
+  --tone-bbf7d0: #bbf7d0;
+  --tone-92400e: #92400e;
+  --tone-fde68a: #fde68a;
+  --tone-3e3c36: #3e3c36;
+}

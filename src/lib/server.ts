@@ -8,6 +8,8 @@ export function guardOrigin(request:Request){const origin=request.headers.get('o
 export class HttpError extends Error{constructor(public status:number,message:string,public code?:string){super(message)}}
 export function errorResponse(error:unknown){if(error instanceof HttpError)return Response.json({error:error.message,code:error.code},{status:error.status});console.error('Błąd obsługi zapytania:',error instanceof Error?error.message:'unknown');return Response.json({error:'Nie udało się zakończyć operacji. Twoje dane pozostają w formularzu. Spróbuj ponownie.'},{status:500})}
 export async function rateLimit(request:Request,namespace:string,max=12){
+  // The outer Worker enforces FORM_LIMIT before Next runs. Avoid a D1 write per request.
+  if(process.env.PLATFORM==='cloudflare')return hash(`${namespace}:${request.headers.get('cf-connecting-ip')||'unknown'}:${process.env.PAYLOAD_SECRET}`)
   const p=await cms();const ip=(process.env.PLATFORM==='cloudflare'?request.headers.get('cf-connecting-ip'):request.headers.get('x-forwarded-for')?.split(',')[0]?.trim())||'local'
   const key=hash(`${namespace}:${ip}:${process.env.PAYLOAD_SECRET}`)
   const now=new Date().toISOString()

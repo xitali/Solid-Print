@@ -1,5 +1,6 @@
 // The generated Next.js server stays behind this small security/cache boundary.
 import nextWorker from '../.open-next/worker.js'
+import { scannerRequest, scheduledMaintenance, processMailCloudflare } from './maintenance.js'
 const protectedPath = (path) => {
   try { path=decodeURIComponent(path).replace(/\/+/g,'/') } catch { return true }
   if (/^\/admin(?:\/|$)/i.test(path)) return true
@@ -20,7 +21,7 @@ function secure(response, env, pathname) {
   result.headers.set('Referrer-Policy','strict-origin-when-cross-origin')
   result.headers.set('Permissions-Policy','camera=(), microphone=(), geolocation=()')
   result.headers.set('Strict-Transport-Security','max-age=15552000')
-  const isPrivate = /^\/(?:admin|api)(?:\/|$)/i.test(pathname || '')
+  const isPrivate = /^\/(?:admin|api|internal)(?:\/|$)/i.test(pathname || '')
   if (isPrivate || env?.SITE_INDEXABLE !== 'true') {
     result.headers.set('X-Robots-Tag','noindex, nofollow')
   } else {
@@ -32,6 +33,7 @@ function secure(response, env, pathname) {
 export default {
   async fetch(request,env,ctx) {
     const url=new URL(request.url)
+    if(url.pathname.startsWith('/internal/scanner/'))return secure(await scannerRequest(request,env),env,url.pathname)
     if (protectedPath(url.pathname) && !await authorized(request,env)) return secure(new Response('Panel właściciela wymaga dodatkowego logowania.',{status:401,headers:{'WWW-Authenticate':'Basic realm="Solid Print", charset="UTF-8"','Cache-Control':'private, no-store'}}), env, url.pathname)
     if(url.pathname.startsWith('/api/quote/') && request.method!=='GET'){
       if(request.headers.get('Origin')!==env.NEXT_PUBLIC_SERVER_URL)return secure(Response.json({error:'Nieprawidłowe źródło zapytania.'},{status:403}), env, url.pathname)
@@ -46,5 +48,6 @@ export default {
       const stored=response.clone();stored.headers.set('Cache-Control','public, max-age=60');ctx.waitUntil(cache.put(request,stored));response.headers.set('Cache-Control','no-cache');response.headers.set('X-Solid-Cache','MISS')
     }
     return response
-  }
+  },
+  async scheduled(controller,env,ctx){ctx.waitUntil(controller.cron==='17 * * * *'?scheduledMaintenance(env):processMailCloudflare(env))}
 }

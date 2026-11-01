@@ -5,7 +5,8 @@ import { useRouter } from 'next/navigation'
 import dynamic from 'next/dynamic'
 import { UploadCloud, Box, RotateCcw, ArrowUpRight, AlertCircle, FileCheck } from 'lucide-react'
 import { HeroVasePrint } from './HeroVasePrint'
-import { MODEL_EXTENSIONS, extensionOf, previewEligibility } from '@/lib/rules'
+import { MODEL_EXTENSIONS, extensionOf, validateFiles, previewEligibility } from '@/lib/rules'
+import { PrintLoader } from './PrintLoader'
 import { setPendingHeroFile } from '@/lib/hero-file-transfer'
 
 const ModelPreview = dynamic(
@@ -14,7 +15,7 @@ const ModelPreview = dynamic(
     ssr: false,
     loading: () => (
       <div className="hero-model-loading">
-        <Box size={28} className="spin-slow" />
+        <PrintLoader />
         <span>Uruchamianie podglądu 3D…</span>
       </div>
     ),
@@ -52,24 +53,8 @@ export function HeroDropZone({
     if (!selected) return
     setError(null)
 
-    const ext = extensionOf(selected.name)
-    const allowed = MODEL_EXTENSIONS as readonly string[]
-
-    if (!allowed.includes(ext)) {
-      setError(`Plik \`${selected.name}\` ma format, którego nie przyjmujemy. Wyślij model w jednym z obsługiwanych formatów.`)
-      return
-    }
-
-    if (selected.size <= 0) {
-      setError(`Plik \`${selected.name}\` jest pusty.`)
-      return
-    }
-
-    if (selected.size > 100 * 1024 * 1024) {
-      const sizeMb = Math.round((selected.size / (1024 * 1024)) * 10) / 10
-      setError(`Plik \`${selected.name}\` ma ${sizeMb} MiB. Limit to 100 MiB. Spróbuj uprościć siatkę lub wyślij \`.step\`.`)
-      return
-    }
+    const errors = validateFiles([{name:selected.name,size:selected.size,kind:'model'}])
+    if(errors.length){setError(errors.join(' '));return}
 
     setFile(selected)
   }

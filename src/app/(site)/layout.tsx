@@ -1,10 +1,18 @@
 import type { Metadata } from 'next'
-import '@fontsource/space-grotesk/600.css'
-import '@fontsource/space-grotesk/700.css'
-import '@fontsource/inter/400.css'
-import '@fontsource/inter/500.css'
-import '@fontsource/inter/600.css'
-import '@fontsource/jetbrains-mono/500.css'
+import { ViewTransition } from 'react'
+import '@fontsource/space-grotesk/latin-600.css'
+import '@fontsource/space-grotesk/latin-ext-600.css'
+import '@fontsource/space-grotesk/latin-700.css'
+import '@fontsource/space-grotesk/latin-ext-700.css'
+import '@fontsource/inter/latin-400.css'
+import '@fontsource/inter/latin-ext-400.css'
+import '@fontsource/inter/latin-500.css'
+import '@fontsource/inter/latin-ext-500.css'
+import '@fontsource/inter/latin-600.css'
+import '@fontsource/inter/latin-ext-600.css'
+import '@fontsource/jetbrains-mono/latin-500.css'
+import '@fontsource/jetbrains-mono/latin-ext-500.css'
+import './tokens.css'
 import './styles.css'
 import './motion.css'
 import { Header } from '@/components/Header'
@@ -21,5 +29,5 @@ export const metadata:Metadata={
 }
 export default async function Layout({children}:{children:React.ReactNode}){
   const settings=await website()
-  return <html lang="pl"><body id="top"><a className="skip-link" href="#main">Przejdź do treści</a><Header phone={settings.phone}/><main id="main">{children}</main><Footer settings={settings}/><RevealEffects/></body></html>
+  return <html lang="pl"><body id="top"><a className="skip-link" href="#main">Przejdź do treści</a><Header phone={settings.phone}/><ViewTransition name="page-content" default="sp-page"><main id="main">{children}</main></ViewTransition><Footer settings={settings}/><RevealEffects/></body></html>
 }

@@ -1,5 +1,6 @@
 import type { CollectionConfig, CollectionBeforeChangeHook } from 'payload'
 import { owner } from '../access'
+import { inquiryHistory, type InquiryEvent } from '../lib/inquiry-history'
 
 export const STATUS_OPTIONS = [
   { label: 'Nowe', value: 'new' },
@@ -12,7 +13,8 @@ export const STATUS_OPTIONS = [
 
 const CLOSED_STATUSES = ['closed', 'rejected']
 
-const setClosedAt: CollectionBeforeChangeHook = ({ data, originalDoc }) => {
+const setClosedAt: CollectionBeforeChangeHook = ({ data, originalDoc, req }) => {
+  data.history = req.context?.anonymize ? [] : inquiryHistory(Array.isArray(originalDoc?.history)?originalDoc.history as InquiryEvent[]:[],originalDoc,data)
   if (CLOSED_STATUSES.includes(data.status) && !originalDoc?.closedAt) {
     data.closedAt = new Date().toISOString()
   } else if (data.status && !CLOSED_STATUSES.includes(data.status)) {
@@ -42,6 +44,7 @@ export const Inquiries: CollectionConfig = {
     beforeChange: [setClosedAt],
   },
   fields: [
+    {name:'history',type:'json',admin:{hidden:true}},
     // Pasek podsumowania z danymi kontaktowymi i parametrami (Item A3)
     {
       name: 'summary',
@@ -173,7 +176,7 @@ export const Inquiries: CollectionConfig = {
                   type: 'text',
                   admin: {
                     width: '33%',
-                    description: 'mm / cm / m / unknown',
+                    components:{Field:'/components/admin/ChoiceField#ChoiceField'},
                   },
                 },
               ],
@@ -183,7 +186,7 @@ export const Inquiries: CollectionConfig = {
               label: 'Dostawa',
               type: 'text',
               admin: {
-                description: 'shipping = wysyłka, pickup = odbiór, discuss = do ustalenia',
+                components:{Field:'/components/admin/ChoiceField#ChoiceField'},
               },
             },
           ],
@@ -191,6 +194,7 @@ export const Inquiries: CollectionConfig = {
         {
           label: 'Klient',
           fields: [
+            {name:'privacyTools',type:'ui',admin:{components:{Field:'/components/admin/InquiryTools#InquiryTools'}}},
             {
               type: 'row',
               fields: [
@@ -224,12 +228,14 @@ export const Inquiries: CollectionConfig = {
               type: 'relationship',
               relationTo: 'quote-files',
               hasMany: true,
+              admin:{components:{Cell:'/components/admin/InquiryDetails#FilesCell'}},
             },
           ],
         },
         {
           label: 'Notatki',
           fields: [
+            {name:'historyView',type:'ui',admin:{components:{Field:'/components/admin/InquiryDetails#InquiryHistory'}}},
             {
               name: 'notes',
               label: 'Notatki wewnętrzne (niewidoczne dla klienta)',
@@ -241,11 +247,12 @@ export const Inquiries: CollectionConfig = {
         {
           label: 'Technicznie',
           fields: [
+            {name:'snapshotView',type:'ui',admin:{components:{Field:'/components/admin/InquiryDetails#ProductSnapshot'}}},
             {
               name: 'productSnapshot',
               label: 'Produkt w chwili zapytania',
               type: 'json',
-              admin: { readOnly: true },
+              admin: { readOnly: true, hidden:true },
             },
           ],
         },

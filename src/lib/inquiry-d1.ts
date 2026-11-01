@@ -1,6 +1,7 @@
 import { bindings } from './cloudflare'
 import type { z } from 'zod'
 import type { inquirySchema } from './rules'
+import { inquiryMessages } from './inquiry-mail'
 
 // D1 has no interactive SQL transactions. A single batch commits the complete receipt atomically.
 export async function saveInquiryD1(
@@ -75,22 +76,12 @@ export async function saveInquiryD1(
     )
   }
 
-  // Queue customer confirmation email into outbox (Item C3)
-  const customerEmailText = `Cześć ${data.name},\n\nDziękujemy za wiadomość. Twoje zapytanie ma numer ${number}.\nSprawdzimy szczegóły i skontaktujemy się z Tobą w sprawie ceny i terminu.\nPrzesłanie zapytania nie jest płatnym zamówieniem.\n\nSolid Print`
-  statements.push(
-    D1.prepare(
-      'INSERT INTO outbox ("to", subject, text, state, attempts, next_attempt_at, updated_at, created_at) VALUES (?, ?, ?, ?, ?, datetime(\'now\'), datetime(\'now\'), datetime(\'now\'))'
-    ).bind(data.email, `Solid Print — zapytanie ${number}`, customerEmailText, 'pending', 0)
-  )
-
-  // Queue owner notification email into outbox
-  const ownerEmail = 'emanuel.wloch@icloud.com'
-  const ownerEmailText = `W panelu pojawiło się nowe zapytanie.\nNumer: ${number}\nOtwórz: https://solidprint.emanuelwloch.pl/admin/collections/inquiries\n\nZałączniki dostępne są po zalogowaniu i pozytywnym wyniku skanowania.`
-  statements.push(
-    D1.prepare(
-      'INSERT INTO outbox ("to", subject, text, state, attempts, next_attempt_at, updated_at, created_at) VALUES (?, ?, ?, ?, ?, datetime(\'now\'), datetime(\'now\'), datetime(\'now\'))'
-    ).bind(ownerEmail, `Nowe zapytanie ${number}`, ownerEmailText, 'pending', 0)
-  )
+  const now = new Date().toISOString()
+  for (const message of inquiryMessages(data, number)) {
+    statements.push(D1.prepare(
+      'INSERT INTO outbox ("to",subject,text,state,attempts,next_attempt_at,updated_at,created_at) VALUES (?,?,?,?,?,?,?,?)'
+    ).bind(message.to, message.subject, message.text, 'pending', 0, now, now, now))
+  }
 
   await D1.batch(statements)
   return number

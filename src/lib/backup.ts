@@ -10,7 +10,6 @@ import type { PostgresAdapter } from '@payloadcms/db-postgres'
 import { localStorageEnabled,s3 } from './storage'
 import { readObject } from './storage'
 const collections=['users','media','products','materials','services','projects','articles','faqs','quote-files','inquiries','upload-sessions','outbox','rate-limits'] as const
-const sha=(bytes:Buffer|string)=>createHash('sha256').update(bytes).digest('hex')
 async function hashStream(stream:Readable){const digest=createHash('sha256');for await(const chunk of stream)digest.update(chunk);return digest.digest('hex')}
 const hashFile=(file:string)=>hashStream(createReadStream(file))
 async function exists(dir:string){return stat(dir).then(()=>true,()=>false)}

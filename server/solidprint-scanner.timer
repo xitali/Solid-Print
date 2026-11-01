@@ -1,0 +1,8 @@
+[Unit]
+Description=Poll Solid Print quarantine every two minutes
+[Timer]
+OnBootSec=60
+OnUnitInactiveSec=120
+RandomizedDelaySec=10
+[Install]
+WantedBy=timers.target
