@@ -10,7 +10,8 @@ Next.js + Payload na Workers przez OpenNext. D1 przechowuje treści, zapytania i
 ## Bezpieczeństwo
 
 - Panel i prywatne API są objęte dodatkowym logowaniem Basic przez HTTPS, również przed utworzeniem pierwszego właściciela. Potem obowiązuje także logowanie Payload.
-- Dane bramki są wyłącznie w lokalnym, ignorowanym pliku .data/admin-access.txt. PAYLOAD_SECRET i hasło bramki trafiają do Workers Secrets.
+- Dane bramki są wyłącznie w lokalnym, ignorowanym pliku .data/admin-access.txt (Login: solidprint). PAYLOAD_SECRET i hasło bramki trafiają do Workers Secrets.
+- Na planie Workers Free (limit 10 ms CPU) tworzenie użytkownika przez formularz Payload powoduje błąd 1102 (z uwagi na 600k iteracji PBKDF2). Właściciela zasila się bezpiecznie poleceniem: `node scripts/seed-d1-owner.mjs` (z opcjonalnymi zmiennymi OWNER_EMAIL i OWNER_PASSWORD), co generuje kompatybilny hash 25k iteracji wykonujący się w ~6 ms.
 - Formularze sprawdzają Origin, walidację danych, losowy token sesji, jednorazowy identyfikator zapytania i limity prób. Dodatkowy limit na brzegu poprzedza uruchomienie CMS.
 - D1 zapisuje komplet zapytania i relacji w atomowym batchu; indeksy unikalne zapobiegają powielaniu zapytań. Przesłanie pliku jest przejmowane przez pojedyncze żądanie.
 - Cache HTML działa przez 60 sekund tylko dla publicznych, anonimowych stron bez parametrów. Panel, API, cookies, autoryzacja i RSC omijają cache.

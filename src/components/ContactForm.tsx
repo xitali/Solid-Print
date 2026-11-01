@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useRef } from 'react'
-import { ArrowUpRight, CheckCircle2, AlertCircle } from 'lucide-react'
+import { ArrowUpRight, CheckCircle2, AlertCircle, ShieldCheck } from 'lucide-react'
 import { sendInquiry, type SubmissionState } from '@/lib/submission'
 
 export function ContactForm() {
@@ -113,15 +113,21 @@ export function ContactForm() {
         </label>
       </div>
 
-      <div className="field">
+      <div className="form-consent-box">
+        <div className="form-consent-box__header">
+          <ShieldCheck size={20} className="form-consent-box__icon" />
+          <span className="form-consent-box__title">Zgoda na kontakt w sprawie zapytania</span>
+        </div>
+        <p className="form-consent-box__desc">
+          Dane z formularza wykorzystujemy wyłącznie, aby odpowiedzieć na Twoją wiadomość i omówić projekt. Szanujemy Twój czas i prywatność — zero spamu i reklam.
+        </p>
         <label className="checkbox-custom-label">
           <input type="checkbox" name="privacy" required className="checkbox-custom" />
           <span className="checkbox-text">
-            Zapoznałem/am się z{' '}
+            Wyrażam zgodę na kontakt w sprawie mojego pytania oraz akceptuję zasady{' '}
             <a href="/prywatnosc" target="_blank" className="text-link">
-              informacją o prywatności
-            </a>{' '}
-            i rozumiem, jak będą obsługiwane dane z zapytania. <span className="req">*</span>
+              polityki prywatności
+            </a>. <span className="req">*</span>
           </span>
         </label>
       </div>

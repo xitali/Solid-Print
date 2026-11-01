@@ -50,12 +50,18 @@ export function HeroDropZone() {
     const allowed = MODEL_EXTENSIONS as readonly string[]
 
     if (!allowed.includes(ext)) {
-      setError(`Format .${ext || 'nieznany'} nie jest obsługiwany. Wybierz model 3D (STL, STEP, OBJ, 3MF, GLB).`)
+      setError(`Plik \`${selected.name}\` ma format, którego nie przyjmujemy. Wyślij model w jednym z obsługiwanych formatów.`)
+      return
+    }
+
+    if (selected.size <= 0) {
+      setError(`Plik \`${selected.name}\` jest pusty.`)
       return
     }
 
     if (selected.size > 100 * 1024 * 1024) {
-      setError(`Plik ma ${(selected.size / 1024 / 1024).toFixed(1)} MiB i przekracza limit 100 MiB na model.`)
+      const sizeMb = Math.round((selected.size / (1024 * 1024)) * 10) / 10
+      setError(`Plik \`${selected.name}\` ma ${sizeMb} MiB. Limit to 100 MiB. Spróbuj uprościć siatkę lub wyślij \`.step\`.`)
       return
     }
 

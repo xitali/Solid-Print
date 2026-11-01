@@ -2,16 +2,67 @@ import { z } from 'zod'
 export const MODEL_EXTENSIONS = ['step','stp','stl','3mf','obj','igs','iges','dxf','dwg','acad','wrl','glb','gltf','3ds','ply','off','3dm','fbx','dae','ifc','brep','fcstd','bim','amf'] as const
 export type FileMeta = {name:string;size:number;kind:string}
 export const extensionOf = (name:string) => name.split('.').pop()?.toLowerCase() || ''
-export function validateFiles(files:FileMeta[]):string[] {
-  const errors:string[]=[]
-  if(files.filter(f=>f.kind==='model').length>5)errors.push('Możesz dodać maksymalnie 5 modeli.')
-  if(files.filter(f=>f.kind==='reference').length>3)errors.push('Możesz dodać maksymalnie 3 materiały pomocnicze.')
-  if(files.filter(f=>f.kind==='model').reduce((n,f)=>n+f.size,0)>250*1024*1024) errors.push('Modele mogą mieć łącznie do 250 MiB.')
-  for(const f of files){
-    const allowed = f.kind==='model' ? MODEL_EXTENSIONS as readonly string[] : f.kind==='reference' ? ['jpg','jpeg','png','pdf'] : []
-    if(!allowed.includes(extensionOf(f.name))) errors.push(`${f.name}: ten format nie jest obsługiwany.`)
-    if(!Number.isSafeInteger(f.size)||f.size<=0||f.size>(f.kind==='model'?100:10)*1024*1024)errors.push(`${f.name}: plik jest pusty lub przekracza limit ${f.kind==='model'?100:10} MiB.`)
-    if(f.name.length>180||/[\x00-\x1f/\\]/.test(f.name)) errors.push('Nieprawidłowa nazwa pliku.')
+export function validateFiles(files: FileMeta[]): string[] {
+  const errors: string[] = []
+  const modelFiles = files.filter((f) => f.kind === 'model')
+  const refFiles = files.filter((f) => f.kind === 'reference')
+
+  if (modelFiles.length > 5) {
+    errors.push('Możesz dodać do 5 modeli. Usuń któryś, żeby dodać nowy.')
+  }
+  if (refFiles.length > 3) {
+    errors.push('Możesz dodać maksymalnie 3 materiały pomocnicze.')
+  }
+
+  const totalModelSize = modelFiles.reduce((acc, f) => acc + (f.size || 0), 0)
+  if (totalModelSize > 250 * 1024 * 1024) {
+    const totalMb = Math.round((totalModelSize / (1024 * 1024)) * 10) / 10
+    errors.push(`Wybrane pliki mają razem ${totalMb} MiB. Limit to 250 MiB.`)
+  }
+
+  const seen = new Set<string>()
+
+  for (const f of files) {
+    const key = `${f.kind}:${f.name.toLowerCase()}:${f.size}`
+    if (seen.has(key)) {
+      errors.push(`Plik \`${f.name}\` już jest na liście.`)
+    }
+    seen.add(key)
+
+    const allowed =
+      f.kind === 'model'
+        ? (MODEL_EXTENSIONS as readonly string[])
+        : f.kind === 'reference'
+        ? ['jpg', 'jpeg', 'png', 'pdf']
+        : []
+
+    const ext = extensionOf(f.name)
+    if (!allowed.includes(ext)) {
+      errors.push(
+        f.kind === 'model'
+          ? `Plik \`${f.name}\` ma format, którego nie przyjmujemy. Wyślij model w jednym z obsługiwanych formatów.`
+          : `Plik \`${f.name}\` ma format, którego nie przyjmujemy. Dozwolone są JPG, PNG oraz PDF.`
+      )
+    }
+
+    if (!Number.isSafeInteger(f.size) || f.size <= 0) {
+      errors.push(`Plik \`${f.name}\` jest pusty.`)
+    } else {
+      const maxMb = f.kind === 'model' ? 100 : 10
+      const maxBytes = maxMb * 1024 * 1024
+      if (f.size > maxBytes) {
+        const sizeMb = Math.round((f.size / (1024 * 1024)) * 10) / 10
+        errors.push(
+          f.kind === 'model'
+            ? `Plik \`${f.name}\` ma ${sizeMb} MiB. Limit to 100 MiB. Spróbuj uprościć siatkę lub wyślij \`.step\`.`
+            : `Plik \`${f.name}\` ma ${sizeMb} MiB. Limit dla plików pomocniczych to 10 MiB.`
+        )
+      }
+    }
+
+    if (f.name.length > 150 || /[\x00-\x1f/\\]/.test(f.name)) {
+      errors.push(`Plik \`${f.name}\` ma nieprawidłową nazwę (maks. 150 znaków bez znaków sterujących).`)
+    }
   }
   return errors
 }

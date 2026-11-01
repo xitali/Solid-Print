@@ -72,6 +72,7 @@ export function QuoteForm({
   const [number, setNumber] = useState('')
   const [preview, setPreview] = useState<Attachment | null>(null)
   const [fieldErrors, setFieldErrors] = useState<{ name?: string; email?: string; description?: string }>({})
+  const [privacyAccepted, setPrivacyAccepted] = useState(false)
 
   const state = useRef<SubmissionState>({ key: '', session: null })
   const formRef = useRef<HTMLFormElement>(null)
@@ -271,7 +272,7 @@ export function QuoteForm({
         ...data,
         type,
         quantity: Number(data.quantity),
-        privacy: form.get('privacy') === 'on',
+        privacy: form.get('privacy') === 'on' || privacyAccepted,
         productId: product ? String(product.id) : undefined,
       },
       fileMeta(files)
@@ -477,8 +478,28 @@ export function QuoteForm({
                     Wybierz pliki
                   </label>
                   <details className="dropzone__formats">
-                    <summary>Obsługiwane formaty plików</summary>
-                    <p className="mono">{MODEL_EXTENSIONS.map((x) => '.' + x).join(' · ')}</p>
+                    <summary>Obsługiwane formaty plików (24 rozszerzenia)</summary>
+                    <div className="dropzone__formats-content">
+                      <div className="dropzone__formats-group">
+                        <span className="dropzone__formats-group-title">Najlepsze do druku (zalecane):</span>
+                        <ul>
+                          <li><strong>.step, .stp</strong> — Bryła CAD z dokładną geometrią (standard inżynierski)</li>
+                          <li><strong>.3mf</strong> — Nowoczesny model siatkowy z jednostkami, kolorami i parametrami</li>
+                          <li><strong>.stl</strong> — Najpopularniejszy format siatki trójkątów (z interaktywnym podglądem 3D)</li>
+                        </ul>
+                      </div>
+                      <div className="dropzone__formats-group">
+                        <span className="dropzone__formats-group-title">Inne modele 3D:</span>
+                        <p className="mono">.obj · .glb · .gltf · .amf · .ply · .off · .3ds · .fbx · .dae · .wrl · .3dm</p>
+                      </div>
+                      <div className="dropzone__formats-group">
+                        <span className="dropzone__formats-group-title">CAD i rysunki:</span>
+                        <p className="mono">.igs · .iges · .dxf · .dwg · .brep · .fcstd · .ifc · .acad · .bim</p>
+                      </div>
+                      <p className="dropzone__formats-note">
+                        Przyjęcie pliku nie oznacza, że model jest poprawny ani że da się go wydrukować. Sprawdzimy to i potwierdzimy cenę oraz termin. Nie wiesz, który format wybrać? Wyślij <strong>.step</strong> albo <strong>.3mf</strong>.
+                      </p>
+                    </div>
                   </details>
                 </div>
 
@@ -879,6 +900,48 @@ export function QuoteForm({
               </div>
             </div>
 
+            {/* Zgoda na kontakt i prywatność z jasnym opisem w logicznym miejscu */}
+            <div className="form-consent-box">
+              <div className="form-consent-box__header">
+                <ShieldCheck size={20} className="form-consent-box__icon" />
+                <span className="form-consent-box__title">Zgoda na kontakt i przygotowanie wyceny</span>
+              </div>
+              <p className="form-consent-box__desc">
+                Twoje dane oraz przesłane pliki posłużą wyłącznie do analizy technologicznej, przygotowania bezpłatnej wyceny i odpowiedzi na Twoje zapytanie. Nie wysyłamy spamu ani nie przekazujemy danych podmiotom trzecim.
+              </p>
+              <label className="checkbox-custom-label">
+                <input
+                  type="checkbox"
+                  name="privacy"
+                  required
+                  checked={privacyAccepted}
+                  onChange={(e) => setPrivacyAccepted(e.target.checked)}
+                  className="checkbox-custom"
+                />
+                <span className="checkbox-text">
+                  Wyrażam zgodę na kontakt w celu przedstawienia wyceny i akceptuję zasady <a href="/prywatnosc" target="_blank" className="text-link">polityki prywatności</a>. <span className="req">*</span>
+                </span>
+              </label>
+            </div>
+
+            {/* Przycisk wysyłki widoczny bezpośrednio w kroku 03 (dla urządzeń mobilnych) */}
+            <div className="quote-mobile-submit">
+              {error && (
+                <div className="form-error-banner" role="alert" style={{ marginBottom: 'var(--s-3)' }}>
+                  <AlertCircle size={20} />
+                  <span>{error}</span>
+                </div>
+              )}
+              <button
+                type="submit"
+                className="btn btn--primary btn--submit"
+                disabled={busy}
+              >
+                {busy ? 'Wysyłanie zapytania…' : 'Wyślij zapytanie'}
+                <ArrowUpRight size={19} />
+              </button>
+            </div>
+
             {/* Pułapka honeypot na boty */}
             <div className="honeypot" aria-hidden="true" style={{ display: 'none' }}>
               <label>
@@ -933,14 +996,17 @@ export function QuoteForm({
             </p>
           </div>
 
-          {/* Zgoda na politykę prywatności z własnym checkboxem (sekcja 3.7) */}
-          <div className="field">
-            <label className="checkbox-custom-label">
-              <input type="checkbox" name="privacy" required className="checkbox-custom" />
-              <span className="checkbox-text">
-                Zapoznałem/am się z <a href="/prywatnosc" target="_blank" className="text-link">informacją o prywatności</a> i rozumiem zasady obsługi danych oraz załączników. <span className="req">*</span>
+          {/* Status zgody w podsumowaniu */}
+          <div className="quote-sidebar-consent-status">
+            {privacyAccepted ? (
+              <span className="consent-status-badge consent-status-badge--accepted mono">
+                <CheckCircle2 size={16} /> ZGODA NA KONTAKT: UDZIELONA
               </span>
-            </label>
+            ) : (
+              <span className="consent-status-badge consent-status-badge--pending mono">
+                <Info size={16} /> WYMAGANA ZGODA W KROKU 03
+              </span>
+            )}
           </div>
 
           {error && (
