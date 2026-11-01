@@ -10,3 +10,13 @@
 Wyniki lokalnego workerd nie są potwierdzeniem wdrożenia ani limitów CPU darmowego planu na serwerach Cloudflare. Testy fizycznych telefonów, dużych plików, skanera AV, dostarczania poczty i odtworzenia kopii pozostają do wykonania.
 
 Przy przeglądzie UI usunięto przepełnienie czterokolumnowej sekcji procesu na telefonach oraz poprawiono kontrast przycisku dodatkowego.
+
+## Wdrożenie publiczne
+
+Adres: https://solidprint.emanuelwloch.pl — HTTPS działa. Wersja Workers: c60ea039-9f2b-4d99-9527-966419e5ffd2. D1 i dwa prywatne buckety R2 są na koncie, które obsługuje domenę.
+
+Sprawdzono na publicznym adresie: health 200, utworzenie sesji 200, zapis zapytania 201, załącznik R2 200, bramka panelu i prywatnego API 401, obcy Origin 403. Użyto wyłącznie danych syntetycznych qa@example.invalid; testowe zapytanie oznaczono jako zamknięte. Załącznik pozostaje w kwarantannie.
+
+Przeglądarka: strona załadowana bez błędów konsoli; przy szerokości 390 px treść nie przepełnia ekranu. To symulacja rozmiaru okna, nie test fizycznego telefonu. Lokalny adres 3000 także został przywrócony po zbudowaniu wariantu lokalnego.
+
+Nie obiecano stałego czasu odpowiedzi ani bezwarunkowego braku opłat R2. Koszty i brakujące elementy produkcyjne opisuje CLOUDFLARE.md.

@@ -6,6 +6,7 @@ import type { Readable } from 'node:stream'
 import { pipeline } from 'node:stream/promises'
 import { ListObjectsV2Command,PutObjectCommand } from '@aws-sdk/client-s3'
 import type { Payload } from 'payload'
+import type { PostgresAdapter } from '@payloadcms/db-postgres'
 import { localStorageEnabled,s3 } from './storage'
 import { readObject } from './storage'
 const collections=['users','media','products','materials','services','projects','articles','faqs','quote-files','inquiries','upload-sessions','outbox','rate-limits'] as const
@@ -16,7 +17,7 @@ async function exists(dir:string){return stat(dir).then(()=>true,()=>false)}
 export async function createBackup(p:Payload,root=process.env.BACKUP_DIR||'.data/backups'){
   const dir=path.resolve(root,new Date().toISOString().replace(/[:.]/g,'-'))
   await mkdir(dir,{recursive:true,mode:0o700})
-  const transactionID=await p.db.beginTransaction({isolationLevel:'repeatable read'})
+  const transactionID=await (p.db as unknown as PostgresAdapter).beginTransaction({isolationLevel:'repeatable read'})
   const req=transactionID?{transactionID}:undefined
   try{
     const data:Record<string,unknown[]>={}
