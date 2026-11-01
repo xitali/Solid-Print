@@ -2,7 +2,7 @@ import Link from 'next/link'
 import { ArrowUpRight, ArrowDown } from 'lucide-react'
 import { SectionLabel } from '@/components/Brand'
 import { Pathways, Process, ProductCard, FAQList, Paragraphs } from '@/components/UI'
-import { HeroVasePrint } from '@/components/HeroVasePrint'
+import { HeroDropZone } from '@/components/HeroDropZone'
 import {
   FileLayersIcon,
   IdeaIcon,
@@ -74,7 +74,7 @@ export default async function Home() {
           </div>
 
           <div className="hero-visual">
-            <HeroVasePrint />
+            <HeroDropZone />
           </div>
         </div>
 

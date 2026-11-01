@@ -13,12 +13,12 @@ export function ModelPreview({file}:{file:File}){
     worker.onmessage=(event:MessageEvent)=>{
       clearTimeout(timer);if(disposed)return;if(event.data.error){setMessage(event.data.error);return}
       try{
-        const element=mount.current!;const scene=new THREE.Scene();scene.background=new THREE.Color('#07090e')
+        const element=mount.current!;const scene=new THREE.Scene();scene.background=new THREE.Color('#1C1B19')
         const camera=new THREE.PerspectiveCamera(38,element.clientWidth/element.clientHeight,.01,100)
         geometry=new THREE.BufferGeometry();geometry.setAttribute('position',new THREE.BufferAttribute(new Float32Array(event.data.positions),3));geometry.computeVertexNormals();geometry.computeBoundingBox();geometry.center()
         const box=geometry.boundingBox!;const size=new THREE.Vector3();box.getSize(size);const scale=2/Math.max(size.x,size.y,size.z,.001);geometry.scale(scale,scale,scale)
-        material=new THREE.MeshStandardMaterial({color:0xb49efc,roughness:.6,metalness:.1,side:THREE.DoubleSide});const mesh=new THREE.Mesh(geometry,material);scene.add(mesh)
-        scene.add(new THREE.HemisphereLight(0xffffff,0x1e1b4b,2.5));const light=new THREE.DirectionalLight(0xffffff,3.2);light.position.set(3,5,4);scene.add(light)
+        material=new THREE.MeshStandardMaterial({color:0xC2410C,roughness:.45,metalness:.15,side:THREE.DoubleSide});const mesh=new THREE.Mesh(geometry,material);scene.add(mesh)
+        scene.add(new THREE.HemisphereLight(0xffffff,0x2b2824,2.5));const light=new THREE.DirectionalLight(0xffffff,3.2);light.position.set(3,5,4);scene.add(light)
         renderer=new THREE.WebGLRenderer({antialias:true});renderer.setPixelRatio(Math.min(devicePixelRatio,2));element.appendChild(renderer.domElement)
         controls=new OrbitControls(camera,renderer.domElement);controls.enableDamping=true;controls.enablePan=false;controls.minDistance=2;controls.maxDistance=9
         reset.current=()=>{camera.position.set(3,2.5,4);controls!.target.set(0,0,0);controls!.update()};reset.current()
