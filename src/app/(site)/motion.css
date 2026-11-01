@@ -55,9 +55,9 @@
   z-index: -1;
   pointer-events: none;
   background: var(--accent);
-  transition: transform .4s var(--motion-button-ease);
+  transition: transform .45s steps(6, end);
 }
-.button-outline { background: transparent; border: 1px solid #334155; color: var(--ink); }
+.button-outline { background: transparent; border: 1px solid var(--line); color: var(--ink); }
 .button-outline::before { background: var(--paper); }
 .button:focus-visible::before { transform: translate3d(0, -101%, 0); }
 .button-outline:focus-visible { background: var(--accent); color: #fff; border-color: var(--accent); }
@@ -138,6 +138,36 @@
 @keyframes sp-stamp-in {
   from { transform: translateY(12px) rotate(-2deg); opacity: 0; }
   to { transform: translateY(0) rotate(-5deg); opacity: 1; }
+}
+
+/* E2: Zdjęcia produktów drukują się od dołu */
+@property --reveal { syntax: '<percentage>'; inherits: true; initial-value: 0%; }
+
+.layer-reveal { position: relative; overflow: hidden; }
+.layer-reveal img { clip-path: inset(var(--reveal) 0 0 0); }
+.layer-reveal.is-in { animation: sp-layer-reveal 1.1s steps(14, end) both; }
+.layer-reveal.is-in::after {
+  content: ''; position: absolute; left: 0; right: 0; top: var(--reveal); height: 2px;
+  background: var(--light-accent, #FF8A5B); box-shadow: 0 0 12px var(--accent); pointer-events: none;
+  animation: sp-nozzle-fade 1.1s linear both;
+}
+@keyframes sp-layer-reveal { from { --reveal: 100%; } to { --reveal: 0%; } }
+@keyframes sp-nozzle-fade  { 0%, 90% { opacity: 1; } 100% { opacity: 0; } }
+
+/* E3: Pasek postępu przewijania z 18 warstw pod nagłówkiem */
+@property --progress { syntax: '<percentage>'; inherits: false; initial-value: 100%; }
+
+@supports (animation-timeline: scroll()) {
+  .site-header::after {
+    content: ''; position: absolute; inset: auto 0 -1px 0; height: 2px;
+    background: repeating-linear-gradient(90deg, var(--accent) 0 calc(100% / 18 - 2px), transparent calc(100% / 18 - 2px) calc(100% / 18));
+    clip-path: inset(0 var(--progress) 0 0);
+    animation: sp-scroll-progress linear both;
+    animation-timeline: scroll(root block);
+    z-index: 50;
+    pointer-events: none;
+  }
+  @keyframes sp-scroll-progress { from { --progress: 100%; } to { --progress: 0%; } }
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -74,7 +74,7 @@ export default async function Home() {
           </div>
 
           <div className="hero-visual">
-            <HeroDropZone />
+            <HeroDropZone material={s?.heroMaterial} layerHeight={s?.heroLayer} />
           </div>
         </div>
 

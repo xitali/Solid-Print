@@ -66,13 +66,52 @@ export function validateFiles(files: FileMeta[]): string[] {
   }
   return errors
 }
+export function isValidNip(raw: string): boolean {
+  const cleaned = raw.replace(/[\s-]/g, '')
+  if (!cleaned) return true
+  if (!/^\d{10}$/.test(cleaned)) return false
+  const weights = [6, 5, 7, 2, 3, 4, 5, 6, 7]
+  let sum = 0
+  for (let i = 0; i < 9; i++) {
+    sum += Number(cleaned[i]) * weights[i]
+  }
+  const checksum = sum % 11
+  return checksum === Number(cleaned[9])
+}
+
+export function normalizePhone(phone: string): string {
+  const trimmed = phone.trim()
+  if (!trimmed) return ''
+  const hasPlus = trimmed.startsWith('+')
+  const digits = trimmed.replace(/\D/g, '')
+  return hasPlus ? `+${digits}` : digits
+}
+
 export const inquirySchema = z.object({
-  type:z.enum(['print','design','product','contact']),name:z.string().trim().min(2).max(100),email:z.email().max(254),
-  phone:z.string().trim().max(40).optional().default(''),company:z.string().trim().max(150).optional().default(''),nip:z.string().trim().max(30).optional().default(''),
-  quantity:z.coerce.number().int().min(1).max(100000).default(1),material:z.string().trim().max(100).default('Doradź mi'),color:z.string().trim().max(100).default('Doradź mi'),
-  unit:z.enum(['mm','cm','m','unknown']).default('unknown'),description:z.string().trim().min(10).max(10000),
-  deadline:z.string().max(80).optional().default(''),delivery:z.enum(['shipping','pickup','discuss']).default('discuss'),
-  productId:z.string().max(50).optional(),variant:z.string().max(200).optional(),privacy:z.literal(true),
+  type: z.enum(['print', 'design', 'product', 'contact']),
+  name: z.string().trim().min(2).max(100),
+  email: z.email().max(254),
+  phone: z.string().trim().max(40).optional().default(''),
+  company: z.string().trim().max(150).optional().default(''),
+  nip: z
+    .string()
+    .trim()
+    .max(30)
+    .optional()
+    .default('')
+    .refine((val) => !val || isValidNip(val), {
+      message: 'Podany NIP jest nieprawidłowy (sprawdź sumę kontrolną).',
+    }),
+  quantity: z.coerce.number().int().min(1).max(100000).default(1),
+  material: z.string().trim().max(100).default('Doradź mi'),
+  color: z.string().trim().max(100).default('Doradź mi'),
+  unit: z.enum(['mm', 'cm', 'm', 'unknown']).default('unknown'),
+  description: z.string().trim().min(10).max(10000),
+  deadline: z.string().max(80).optional().default(''),
+  delivery: z.enum(['shipping', 'pickup', 'discuss']).default('discuss'),
+  productId: z.string().max(50).optional(),
+  variant: z.string().max(200).optional(),
+  privacy: z.literal(true),
 })
 export function validateInquiry(input:unknown,files:FileMeta[]=[]){
   return inquirySchema.superRefine((data,ctx)=>{

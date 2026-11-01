@@ -21,7 +21,13 @@ const ModelPreview = dynamic(
   }
 )
 
-export function HeroDropZone() {
+export function HeroDropZone({
+  material,
+  layerHeight,
+}: {
+  material?: string
+  layerHeight?: string
+} = {}) {
   const router = useRouter()
   const [file, setFile] = useState<File | null>(null)
   const [isOver, setIsOver] = useState(false)
@@ -194,7 +200,7 @@ export function HeroDropZone() {
         <div className="hero-drop-resting">
           {/* Animowany wydruk 18 warstw wazonu (Plansza 03) */}
           <div className="hero-drop-vase-container">
-            <HeroVasePrint />
+            <HeroVasePrint material={material} layerHeight={layerHeight} />
           </div>
 
           {/* Pływający panel akcji i upuszczania modelu */}

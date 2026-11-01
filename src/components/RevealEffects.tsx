@@ -2,7 +2,7 @@
 import { useEffect } from 'react'
 import { usePathname } from 'next/navigation'
 
-const targets = 'main .section-title-row, main .path-card, main .product-card, main .process-step, main .application-card, main .workshop-grid, main .service-card, main .material-card, main .article-card, main .realization-card, main .contact-form-card, main .empty-state'
+const targets = 'main .section-title-row, main .path-card, main .product-card, main .process-step, main .application-card, main .workshop-grid, main .service-card, main .material-card, main .article-card, main .realization-card, main .contact-form-card, main .empty-state, .layer-reveal, .card-thumb, .product-visual'
 
 export function RevealEffects(){
   const pathname=usePathname()
@@ -16,7 +16,10 @@ export function RevealEffects(){
     const observer=new IntersectionObserver(entries=>{
       for(const entry of entries){
         if(!entry.isIntersecting)continue
-        if(!media.matches){entry.target.classList.add('sp-reveal');animated.add(entry.target)}
+        if(!media.matches){
+          entry.target.classList.add('sp-reveal', 'is-in')
+          animated.add(entry.target)
+        }
         observer.unobserve(entry.target)
       }
     },{threshold:.1})
