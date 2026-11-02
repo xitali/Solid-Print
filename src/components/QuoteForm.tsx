@@ -17,7 +17,9 @@ import {
 } from 'lucide-react'
 import { MODEL_EXTENSIONS, validateFiles, validateInquiry, previewEligibility, type FileMeta } from '@/lib/rules'
 import type { Product, Material } from '@/lib/types'
-import { sendInquiry, SubmissionError, type SubmissionState, type SubmissionSession, type UploadItem } from '@/lib/submission'
+import { sendInquiry, type SubmissionState } from '@/lib/submission'
+import { SubmissionSuccess } from './quote/SubmissionSuccess'
+import { useFileUploads } from './quote/useFileUploads'
 import { FileLayersIcon, IdeaIcon, ProductBoxIcon } from '@/components/Icons'
 import { consumePendingHeroFile } from '@/lib/hero-file-transfer'
 import { PrintLoader } from './PrintLoader'
@@ -216,47 +218,7 @@ export function QuoteForm({
   const patchFile = (id: string, patch: Partial<Attachment>) =>
     setFiles((list) => list.map((f) => (f.id === id ? { ...f, ...patch } : f)))
 
-  async function upload(file: UploadItem, serverId: number, auth: SubmissionSession) {
-    patchFile(file.id, { status: 'uploading', progress: 0, serverId })
-    await new Promise<void>((resolve, reject) => {
-      const xhr = new XMLHttpRequest()
-      xhr.open('PUT', `/api/quote/files/${serverId}`)
-      xhr.setRequestHeader('x-upload-token', auth.token)
-      xhr.setRequestHeader('Content-Type', 'application/octet-stream')
-      xhr.timeout = 5 * 60 * 1000
-
-      xhr.upload.onprogress = (e) => {
-        if (e.lengthComputable) {
-          patchFile(file.id, { progress: Math.round((e.loaded / e.total) * 100) })
-        }
-      }
-      xhr.onload = () => {
-        if (xhr.status >= 200 && xhr.status < 300) {
-          patchFile(file.id, { status: 'done', progress: 100 })
-          resolve()
-        } else {
-          let message = 'Nie udało się przesłać pliku.'
-          let code: string | undefined
-          try {
-            const result = JSON.parse(xhr.responseText)
-            message = result.error || message
-            code = result.code
-          } catch {}
-          patchFile(file.id, { status: 'error' })
-          reject(new SubmissionError(`${file.file.name}: ${message}`, code))
-        }
-      }
-      xhr.onerror = () => {
-        patchFile(file.id, { status: 'error' })
-        reject(new Error('Połączenie zostało przerwane. Wyślij zapytanie ponownie, aby wznowić.'))
-      }
-      xhr.ontimeout = () => {
-        patchFile(file.id, { status: 'error' })
-        reject(new Error('Przesyłanie trwało zbyt długo. Spróbuj ponownie.'))
-      }
-      xhr.send(file.file)
-    })
-  }
+  const upload = useFileUploads(patchFile)
 
   async function submit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault()
@@ -305,58 +267,7 @@ export function QuoteForm({
 
   // Ekran sukcesu z numerem zapytania i osią „co dalej” (sekcja 3.7)
   if (number) {
-    return (
-      <section className="submission-success form-card" role="status">
-        <div className="submission-success__badge">
-          <PrintLoader success />
-        </div>
-        <h2 tabIndex={-1}>Twój pomysł jest już u nas.</h2>
-        <p className="submission-success__intro">
-          Zapisaliśmy Twoje zapytanie. Odpowiemy na podany adres e-mail z dokładną oceną technologiczną, wyceną oraz terminem wykonania.
-        </p>
-
-        <div className="submission-number-box">
-          <span className="mono muted">NUMER TWOJEGO ZAPYTANIA</span>
-          <div className="submission-number">{number}</div>
-        </div>
-
-        {/* Krótka oś „co dalej” (ocena → wycena → wykonanie → odbiór) */}
-        <div className="next-steps-timeline">
-          <h3 className="mono muted">CO DZIEJE SIĘ DALEJ?</h3>
-          <div className="timeline-grid">
-            <div className="timeline-step">
-              <span className="step-num mono">01</span>
-              <h4>Ocena techniczna</h4>
-              <p>Sprawdzamy geometrię modelu, grubość ścianek i dobór dyszy.</p>
-            </div>
-            <div className="timeline-step">
-              <span className="step-num mono">02</span>
-              <h4>Wycena i dobór materiału</h4>
-              <p>Przesyłamy konkretną cenę, propozycję materiału i termin.</p>
-            </div>
-            <div className="timeline-step">
-              <span className="step-num mono">03</span>
-              <h4>Realizacja po Twojej zgodzie</h4>
-              <p>Drukujemy dopiero po Twojej pełnej akceptacji ustaleń.</p>
-            </div>
-            <div className="timeline-step">
-              <span className="step-num mono">04</span>
-              <h4>Odbiór lub wysyłka</h4>
-              <p>Bezpiecznie pakujemy i wysyłamy lub przygotowujemy do odbioru.</p>
-            </div>
-          </div>
-        </div>
-
-        <div className="submission-success__actions">
-          <Link className="btn btn--primary" href="/">
-            Wróć do strony głównej <ArrowUpRight size={18} />
-          </Link>
-          <Link className="btn btn--secondary" href="/projekty">
-            Zobacz gotowe projekty
-          </Link>
-        </div>
-      </section>
-    )
+    return <SubmissionSuccess number={number}/>
   }
 
   return (
@@ -905,7 +816,7 @@ export function QuoteForm({
                 <span className="form-consent-box__title">Zgoda na kontakt i przygotowanie wyceny</span>
               </div>
               <p className="form-consent-box__desc">
-                Twoje dane oraz przesłane pliki posłużą wyłącznie do analizy technologicznej, przygotowania bezpłatnej wyceny i odpowiedzi na Twoje zapytanie. Nie wysyłamy spamu ani nie przekazujemy danych podmiotom trzecim.
+                Twoje dane oraz przesłane pliki posłużą do analizy projektu, przygotowania wyceny i odpowiedzi na zapytanie. Korzystamy z usług hostingu i prywatnego skanera plików zgodnie z polityką prywatności.
               </p>
               <label className="checkbox-custom-label">
                 <input
@@ -1029,7 +940,7 @@ export function QuoteForm({
               <ShieldCheck size={16} /> BEZPŁATNA OCENA MODELU
             </div>
             <div>
-              <Clock size={16} /> ODPOWIEDŹ DO 24H
+              <Clock size={16} /> TERMIN ODPOWIEDZI USTALAMY INDYWIDUALNIE
             </div>
           </div>
 

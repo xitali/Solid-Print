@@ -74,6 +74,7 @@ export function HeroVasePrint({
     const io = new IntersectionObserver(
       ([entry]) => {
         visible = entry.isIntersecting
+        resume()
       },
       { threshold: 0.15 }
     )
@@ -81,6 +82,7 @@ export function HeroVasePrint({
     if (cardRef.current) io.observe(cardRef.current)
 
     const tick = (now: number) => {
+      raf = 0
       const dt = now - last
       last = now
 
@@ -102,15 +104,24 @@ export function HeroVasePrint({
       const offset = Math.sin((elapsed / 1000) * 5.5) * half
       headRef.current?.setAttribute('transform', `translate(${offset.toFixed(1)} 0)`)
 
-      if (l < TOTAL_LAYERS) {
+      if (l < TOTAL_LAYERS && visible && !document.hidden) {
         raf = requestAnimationFrame(tick)
       }
     }
+
+    const resume = () => {
+      cancelAnimationFrame(raf)
+      raf = 0
+      last = performance.now()
+      if (visible && !document.hidden && elapsed < TOTAL_LAYERS * LAYER_MS) raf = requestAnimationFrame(tick)
+    }
+    document.addEventListener('visibilitychange',resume)
 
     raf = requestAnimationFrame(tick)
     return () => {
       cancelAnimationFrame(raf)
       io.disconnect()
+      document.removeEventListener('visibilitychange',resume)
     }
   }, [run])
 
