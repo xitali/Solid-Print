@@ -13,6 +13,7 @@ export function StatusCell({ cellData }: { cellData?: string }) {
   const tone = TONE[cellData ?? ''] ?? { bg: '#E3DFD5', fg: '#1C1B19', label: cellData ?? '—' }
   return (
     <span
+      className="sp-status-cell"
       style={{
         display: 'inline-block',
         background: tone.bg,

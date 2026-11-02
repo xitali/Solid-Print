@@ -29,5 +29,5 @@ export const metadata:Metadata={
 }
 export default async function Layout({children}:{children:React.ReactNode}){
   const settings=await website()
-  return <html lang="pl"><body id="top"><a className="skip-link" href="#main">Przejdź do treści</a><Header phone={settings.phone}/><ViewTransition name="page-content" default="sp-page"><main id="main">{children}</main></ViewTransition><Footer settings={settings}/><RevealEffects/></body></html>
+  return <html lang="pl" data-scroll-behavior="smooth"><body id="top"><a className="skip-link" href="#main">Przejdź do treści</a><Header phone={settings.phone}/><ViewTransition name="page-content" default="sp-page"><main id="main">{children}</main></ViewTransition><Footer settings={settings}/><RevealEffects/></body></html>
 }

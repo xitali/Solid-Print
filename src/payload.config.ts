@@ -30,5 +30,5 @@ admin: {
   },
 typescript: { outputFile: path.resolve(dirname, 'payload-types.ts') },
 globals: [Website],
-collections:[Inquiries,...systemCollections,Products,...catalogCollections(onCloudflare)]
+collections:[Inquiries,...systemCollections.filter(c=>c.slug==='quote-files'),Products,...catalogCollections(onCloudflare),...systemCollections.filter(c=>c.slug!=='quote-files')]
 })

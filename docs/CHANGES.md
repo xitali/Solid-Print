@@ -1,3 +1,5 @@
+> Aktualny stan: [przegląd 02.11.2026](PRZEGLAD-USPRAWNIEN.md). Obowiązuje paleta z najnowszego kodu: papier / grafit / pomarańcz. Starsze opisy kolorystyki i wdrożenia poniżej są historyczne.
+
 # Zmiany po planie v2
 
 ## 01.11.2026 — paleta Navy / Lavender / Black

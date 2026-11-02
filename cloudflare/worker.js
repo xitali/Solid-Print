@@ -21,7 +21,7 @@ function secure(response, env, pathname) {
   result.headers.set('Referrer-Policy','strict-origin-when-cross-origin')
   result.headers.set('Permissions-Policy','camera=(), microphone=(), geolocation=()')
   result.headers.set('Strict-Transport-Security','max-age=15552000')
-  const isPrivate = /^\/(?:admin|api|internal)(?:\/|$)/i.test(pathname || '')
+  const isPrivate = response.status>=400 || protectedPath(pathname||'/') || /^\/(?:admin|api|internal)(?:\/|$)/i.test(pathname || '')
   if (isPrivate || env?.SITE_INDEXABLE !== 'true') {
     result.headers.set('X-Robots-Tag','noindex, nofollow')
   } else {
@@ -49,5 +49,5 @@ export default {
     }
     return response
   },
-  async scheduled(controller,env,ctx){ctx.waitUntil(controller.cron==='17 * * * *'?scheduledMaintenance(env):processMailCloudflare(env))}
+  async scheduled(controller,env,ctx){ctx.waitUntil(Promise.all([scheduledMaintenance(env),processMailCloudflare(env)]))}
 }

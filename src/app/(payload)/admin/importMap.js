@@ -7,6 +7,7 @@ import { FilesCell as FilesCell_dd48b07e3148f733a56568c4b96ddc83 } from '../../.
 import { InquiryHistory as InquiryHistory_dd48b07e3148f733a56568c4b96ddc83 } from '../../../components/admin/InquiryDetails'
 import { ProductSnapshot as ProductSnapshot_dd48b07e3148f733a56568c4b96ddc83 } from '../../../components/admin/InquiryDetails'
 import { Download as Download_2d30c99c2ef8d5263b45469e5da4acfd } from '../../../components/admin/Download'
+import { ProductThumbnail as ProductThumbnail_aeaa5c010f18ba71f35c7b6f93d4de85 } from '../../../components/admin/ProductThumbnail'
 import { SlugField as SlugField_d66ddfc75b0270bf9636e30c2125444d } from '../../../components/admin/SlugField'
 import { Icon as Icon_91a09b539d3c86b0aebf520e7564ce08 } from '../../../components/admin/Logo'
 import { Logo as Logo_91a09b539d3c86b0aebf520e7564ce08 } from '../../../components/admin/Logo'
@@ -25,6 +26,7 @@ export const importMap = {
   "/components/admin/InquiryDetails#InquiryHistory": InquiryHistory_dd48b07e3148f733a56568c4b96ddc83,
   "/components/admin/InquiryDetails#ProductSnapshot": ProductSnapshot_dd48b07e3148f733a56568c4b96ddc83,
   "/components/admin/Download#Download": Download_2d30c99c2ef8d5263b45469e5da4acfd,
+  "/components/admin/ProductThumbnail#ProductThumbnail": ProductThumbnail_aeaa5c010f18ba71f35c7b6f93d4de85,
   "/components/admin/SlugField#SlugField": SlugField_d66ddfc75b0270bf9636e30c2125444d,
   "/components/admin/Logo#Icon": Icon_91a09b539d3c86b0aebf520e7564ce08,
   "/components/admin/Logo#Logo": Logo_91a09b539d3c86b0aebf520e7564ce08,

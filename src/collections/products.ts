@@ -15,7 +15,7 @@ export const Products: CollectionConfig = {
   admin: {
     group: 'Oferta',
     useAsTitle: 'title',
-    defaultColumns: ['title', 'category', 'priceFrom', 'available', 'published'],
+    defaultColumns: ['thumbnail','title', 'category', 'priceFrom', 'available', 'published'],
     description: 'Katalog produktów i gotowych modeli 3D.',
     preview:doc=>`${process.env.NEXT_PUBLIC_SERVER_URL||'http://127.0.0.1:3000'}/projekty/${doc.slug}`,
   },
@@ -26,6 +26,7 @@ export const Products: CollectionConfig = {
     delete: owner,
   },
   fields: [
+    {name:'thumbnail',label:'Zdjęcie',type:'ui',admin:{components:{Cell:'/components/admin/ProductThumbnail#ProductThumbnail'}}},
     // Pasek boczny
     slugField,
     publicationField,

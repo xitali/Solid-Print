@@ -68,11 +68,7 @@ export interface Config {
   blocks: {};
   collections: {
     inquiries: Inquiry;
-    users: User;
     'quote-files': QuoteFile;
-    'upload-sessions': UploadSession;
-    outbox: Outbox;
-    'rate-limits': RateLimit;
     products: Product;
     media: Media;
     materials: Material;
@@ -80,6 +76,10 @@ export interface Config {
     projects: Project;
     articles: Article;
     faqs: Faq;
+    users: User;
+    'upload-sessions': UploadSession;
+    outbox: Outbox;
+    'rate-limits': RateLimit;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -88,11 +88,7 @@ export interface Config {
   collectionsJoins: {};
   collectionsSelect: {
     inquiries: InquiriesSelect<false> | InquiriesSelect<true>;
-    users: UsersSelect<false> | UsersSelect<true>;
     'quote-files': QuoteFilesSelect<false> | QuoteFilesSelect<true>;
-    'upload-sessions': UploadSessionsSelect<false> | UploadSessionsSelect<true>;
-    outbox: OutboxSelect<false> | OutboxSelect<true>;
-    'rate-limits': RateLimitsSelect<false> | RateLimitsSelect<true>;
     products: ProductsSelect<false> | ProductsSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
     materials: MaterialsSelect<false> | MaterialsSelect<true>;
@@ -100,6 +96,10 @@ export interface Config {
     projects: ProjectsSelect<false> | ProjectsSelect<true>;
     articles: ArticlesSelect<false> | ArticlesSelect<true>;
     faqs: FaqsSelect<false> | FaqsSelect<true>;
+    users: UsersSelect<false> | UsersSelect<true>;
+    'upload-sessions': UploadSessionsSelect<false> | UploadSessionsSelect<true>;
+    outbox: OutboxSelect<false> | OutboxSelect<true>;
+    'rate-limits': RateLimitsSelect<false> | RateLimitsSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -207,74 +207,6 @@ export interface QuoteFile {
   status?: ('pending' | 'uploading' | 'quarantined' | 'clean' | 'infected') | null;
   scanMessage?: string | null;
   inquiryId?: string | null;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "users".
- */
-export interface User {
-  id: number;
-  name?: string | null;
-  role: 'owner';
-  updatedAt: string;
-  createdAt: string;
-  email: string;
-  resetPasswordToken?: string | null;
-  resetPasswordExpiration?: string | null;
-  salt?: string | null;
-  hash?: string | null;
-  resetPasswordRequestedAt?: string | null;
-  loginAttempts?: number | null;
-  lockUntil?: string | null;
-  sessions?:
-    | {
-        id: string;
-        createdAt?: string | null;
-        expiresAt: string;
-      }[]
-    | null;
-  password?: string | null;
-  collection: 'users';
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "upload-sessions".
- */
-export interface UploadSession {
-  id: number;
-  tokenHash?: string | null;
-  expiresAt?: string | null;
-  ipHash?: string | null;
-  inquiryId?: string | null;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "outbox".
- */
-export interface Outbox {
-  id: number;
-  to: string;
-  subject: string;
-  text: string;
-  state?: ('pending' | 'sent' | 'failed') | null;
-  attempts?: number | null;
-  nextAttemptAt?: string | null;
-  lastError?: string | null;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "rate-limits".
- */
-export interface RateLimit {
-  id: number;
-  key?: string | null;
-  expiresAt?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -454,6 +386,74 @@ export interface Faq {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "users".
+ */
+export interface User {
+  id: number;
+  name?: string | null;
+  role: 'owner';
+  updatedAt: string;
+  createdAt: string;
+  email: string;
+  resetPasswordToken?: string | null;
+  resetPasswordExpiration?: string | null;
+  salt?: string | null;
+  hash?: string | null;
+  resetPasswordRequestedAt?: string | null;
+  loginAttempts?: number | null;
+  lockUntil?: string | null;
+  sessions?:
+    | {
+        id: string;
+        createdAt?: string | null;
+        expiresAt: string;
+      }[]
+    | null;
+  password?: string | null;
+  collection: 'users';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "upload-sessions".
+ */
+export interface UploadSession {
+  id: number;
+  tokenHash?: string | null;
+  expiresAt?: string | null;
+  ipHash?: string | null;
+  inquiryId?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "outbox".
+ */
+export interface Outbox {
+  id: number;
+  to: string;
+  subject: string;
+  text: string;
+  state?: ('pending' | 'sent' | 'failed') | null;
+  attempts?: number | null;
+  nextAttemptAt?: string | null;
+  lastError?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "rate-limits".
+ */
+export interface RateLimit {
+  id: number;
+  key?: string | null;
+  expiresAt?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
 export interface PayloadKv {
@@ -481,24 +481,8 @@ export interface PayloadLockedDocument {
         value: number | Inquiry;
       } | null)
     | ({
-        relationTo: 'users';
-        value: number | User;
-      } | null)
-    | ({
         relationTo: 'quote-files';
         value: number | QuoteFile;
-      } | null)
-    | ({
-        relationTo: 'upload-sessions';
-        value: number | UploadSession;
-      } | null)
-    | ({
-        relationTo: 'outbox';
-        value: number | Outbox;
-      } | null)
-    | ({
-        relationTo: 'rate-limits';
-        value: number | RateLimit;
       } | null)
     | ({
         relationTo: 'products';
@@ -527,6 +511,22 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'faqs';
         value: number | Faq;
+      } | null)
+    | ({
+        relationTo: 'users';
+        value: number | User;
+      } | null)
+    | ({
+        relationTo: 'upload-sessions';
+        value: number | UploadSession;
+      } | null)
+    | ({
+        relationTo: 'outbox';
+        value: number | Outbox;
+      } | null)
+    | ({
+        relationTo: 'rate-limits';
+        value: number | RateLimit;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -602,31 +602,6 @@ export interface InquiriesSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "users_select".
- */
-export interface UsersSelect<T extends boolean = true> {
-  name?: T;
-  role?: T;
-  updatedAt?: T;
-  createdAt?: T;
-  email?: T;
-  resetPasswordToken?: T;
-  resetPasswordExpiration?: T;
-  salt?: T;
-  hash?: T;
-  resetPasswordRequestedAt?: T;
-  loginAttempts?: T;
-  lockUntil?: T;
-  sessions?:
-    | T
-    | {
-        id?: T;
-        createdAt?: T;
-        expiresAt?: T;
-      };
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "quote-files_select".
  */
 export interface QuoteFilesSelect<T extends boolean = true> {
@@ -639,43 +614,6 @@ export interface QuoteFilesSelect<T extends boolean = true> {
   status?: T;
   scanMessage?: T;
   inquiryId?: T;
-  updatedAt?: T;
-  createdAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "upload-sessions_select".
- */
-export interface UploadSessionsSelect<T extends boolean = true> {
-  tokenHash?: T;
-  expiresAt?: T;
-  ipHash?: T;
-  inquiryId?: T;
-  updatedAt?: T;
-  createdAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "outbox_select".
- */
-export interface OutboxSelect<T extends boolean = true> {
-  to?: T;
-  subject?: T;
-  text?: T;
-  state?: T;
-  attempts?: T;
-  nextAttemptAt?: T;
-  lastError?: T;
-  updatedAt?: T;
-  createdAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "rate-limits_select".
- */
-export interface RateLimitsSelect<T extends boolean = true> {
-  key?: T;
-  expiresAt?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -830,6 +768,68 @@ export interface FaqsSelect<T extends boolean = true> {
   answer?: T;
   order?: T;
   published?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "users_select".
+ */
+export interface UsersSelect<T extends boolean = true> {
+  name?: T;
+  role?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  email?: T;
+  resetPasswordToken?: T;
+  resetPasswordExpiration?: T;
+  salt?: T;
+  hash?: T;
+  resetPasswordRequestedAt?: T;
+  loginAttempts?: T;
+  lockUntil?: T;
+  sessions?:
+    | T
+    | {
+        id?: T;
+        createdAt?: T;
+        expiresAt?: T;
+      };
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "upload-sessions_select".
+ */
+export interface UploadSessionsSelect<T extends boolean = true> {
+  tokenHash?: T;
+  expiresAt?: T;
+  ipHash?: T;
+  inquiryId?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "outbox_select".
+ */
+export interface OutboxSelect<T extends boolean = true> {
+  to?: T;
+  subject?: T;
+  text?: T;
+  state?: T;
+  attempts?: T;
+  nextAttemptAt?: T;
+  lastError?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "rate-limits_select".
+ */
+export interface RateLimitsSelect<T extends boolean = true> {
+  key?: T;
+  expiresAt?: T;
   updatedAt?: T;
   createdAt?: T;
 }

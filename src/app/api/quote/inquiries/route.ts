@@ -1,6 +1,7 @@
 import { onCloudflare } from '@/lib/cloudflare'
 import { saveInquiryD1 } from '@/lib/inquiry-d1'
-import { randomBytes } from 'node:crypto'
+import { withReceipt } from '@/lib/receipt'
+import { inquiryMessages } from '@/lib/inquiry-mail'
 import { cms } from '@/lib/cms'
 import { validateInquiry } from '@/lib/rules'
 import { guardOrigin,getSession,readJSON,HttpError,errorResponse,rateLimit } from '@/lib/server'
@@ -36,20 +37,19 @@ export async function POST(request:Request){try{
   }
   await rateLimit(request,'inquiries',8)
   if(onCloudflare){
-    const number=`SP-${new Date().getUTCFullYear()}-${randomBytes(4).toString('hex').toUpperCase()}`
-    try{await saveInquiryD1(data,String(session.id),body.idempotencyKey,number,files,productSnapshot);return Response.json({number},{status:201})}
+    try{return await withReceipt(async number=>{await saveInquiryD1(data,String(session.id),body.idempotencyKey,number,files,productSnapshot);return Response.json({number},{status:201})})}
     catch(error){const retry=await p.find({collection:'inquiries',where:{idempotencyKey:{equals:body.idempotencyKey}},limit:1,depth:0});if(retry.docs[0]?.email===data.email)return Response.json({number:retry.docs[0].number});throw error}
   }
+  return await withReceipt(async number=>{
   const transactionID=await p.db.beginTransaction();const req=transactionID?{transactionID}:undefined
   try{
-    const number=`SP-${new Date().getUTCFullYear()}-${randomBytes(4).toString('hex').toUpperCase()}`
     const {privacy,variant,productId,...fields}=data
     const inquiry=await p.create({collection:'inquiries',req,data:{...fields,number,status:'new',sessionId:String(session.id),idempotencyKey:body.idempotencyKey,productSnapshot,files:files.map(f=>f.id)}})
     for(const file of files)await p.update({collection:'quote-files',id:file.id,req,data:{inquiryId:String(inquiry.id)}})
     await p.update({collection:'upload-sessions',id:session.id,req,data:{inquiryId:String(inquiry.id)}})
-    await p.create({collection:'outbox',req,data:{to:data.email,subject:`Solid Print — zapytanie ${number}`,text:`Cześć ${data.name},\n\nDziękujemy za wiadomość. Twoje zapytanie ma numer ${number}.\nSprawdzimy szczegóły i skontaktujemy się z Tobą w sprawie ceny i terminu.\nPrzesłanie zapytania nie jest płatnym zamówieniem.\n\nSolid Print`,state:'pending',attempts:0,nextAttemptAt:new Date().toISOString()}})
-    if(process.env.OWNER_EMAIL)await p.create({collection:'outbox',req,data:{to:process.env.OWNER_EMAIL,subject:`Nowe zapytanie ${number}`,text:`W panelu pojawiło się nowe zapytanie.\nNumer: ${number}\nOtwórz: ${process.env.NEXT_PUBLIC_SERVER_URL}/admin/collections/inquiries/${inquiry.id}\n\nZałączniki dostępne są po zalogowaniu i pozytywnym wyniku skanowania.`,state:'pending',attempts:0,nextAttemptAt:new Date().toISOString()}})
+    for(const message of inquiryMessages(data,number))await p.create({collection:'outbox',req,data:{...message,state:'pending',attempts:0,nextAttemptAt:new Date().toISOString()}})
     if(transactionID)await p.db.commitTransaction(transactionID)
     return Response.json({number},{status:201})
   }catch(e){if(transactionID)await p.db.rollbackTransaction(transactionID);throw e}
+  })
 }catch(e){return errorResponse(e)}}

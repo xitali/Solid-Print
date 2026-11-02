@@ -1,3 +1,5 @@
+> Aktualny stan: [przegląd 02.11.2026](PRZEGLAD-USPRAWNIEN.md). Obowiązuje paleta z najnowszego kodu: papier / grafit / pomarańcz. Starsze opisy kolorystyki i wdrożenia poniżej są historyczne.
+
 # Solid Print — plan strony (wersja 2)
 
 Oct 31, 2026 · @Emanuel Włoch

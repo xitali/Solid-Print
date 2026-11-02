@@ -1,3 +1,5 @@
+> Aktualizacja 02.11.2026: prywatny skaner ClamAV w kontenerze 103 jest połączony z D1/R2; test czystego pliku i EICAR przeszedł. Retencja i kolejka HTTP mają harmonogram co 5 minut. Adapter poczty nie ma jeszcze dostawcy. Automatyczne niezależne kopie D1+R2 pozostają do wykonania. W panelu są wskaźniki rezerwacji miejsca i progu 75%; nie obejmują rozliczeń całego konta. Szczegółowa macierz i dowody: [przegląd](PRZEGLAD-USPRAWNIEN.md).
+
 # Cloudflare — wersja testowa
 
 Adres docelowy: https://solidprint.emanuelwloch.pl
