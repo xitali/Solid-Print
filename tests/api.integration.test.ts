@@ -1,9 +1,14 @@
-import { describe,it,expect } from 'vitest'
+import { describe,it,expect,beforeAll } from 'vitest'
 const base='http://127.0.0.1:3000'
 const active=process.env.RUN_INTEGRATION==='true'
 const headers={'Content-Type':'application/json',Origin:base}
 const submit=(url:string,body:unknown,extra:Record<string,string>={})=>fetch(base+url,{method:'POST',headers:{...headers,...extra},body:JSON.stringify(body)})
 describe.skipIf(!active)('rzeczywisty serwer i PostgreSQL',()=>{
+  beforeAll(async()=>{
+    // First compilation in next dev is not API execution time.
+    await fetch(base+'/api/health')
+    await fetch(base+'/api/quote/sessions',{method:'POST',headers:{...headers,Origin:'https://invalid.example'},body:'{}'})
+  },60000)
   it('odrzuca zapytania z innego źródła oraz pliki wykonywalne',async()=>{
     const badOrigin=await submit('/api/quote/sessions',{files:[]},{Origin:'https://example.org'});expect(badOrigin.status).toBe(403)
     const badFile=await submit('/api/quote/sessions',{files:[{name:'model.exe',size:20,kind:'model'}]});expect(badFile.status).toBe(400)

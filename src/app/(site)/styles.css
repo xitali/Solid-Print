@@ -551,7 +551,7 @@ p { color: var(--muted); }
 .vase-layer-counter {
   font-weight: 600;
   letter-spacing: 0.06em;
-  color: var(--accent);
+  color: var(--accent-hover);
 }
 .vase-canvas-wrapper {
   position: relative;
@@ -659,6 +659,7 @@ p { color: var(--muted); }
   color: var(--paper);
 }
 .dark-section p { color: var(--tone-b0aca0); }
+.dark-section .contact-form-card p { color: var(--ink-soft); }
 .dark-section .section-number { color: var(--tone-a09e96); }
 .dark-section .mini-layers i { background: var(--light-accent); }
 

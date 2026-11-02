@@ -67,3 +67,15 @@ jobs:
       - run: npm test
       - run: npx playwright install --with-deps chromium
       - run: npm run test:browser
+      - name: Przygotuj pomiar wersji produkcyjnej
+        run: |
+          fuser -k 3000/tcp
+          npm run build
+          npm run start > /tmp/solidprint-production.log 2>&1 &
+          for attempt in $(seq 1 30); do
+            if curl -fsS http://127.0.0.1:3000/api/health; then exit 0; fi
+            sleep 2
+          done
+          cat /tmp/solidprint-production.log
+          exit 1
+      - run: npm run test:performance
