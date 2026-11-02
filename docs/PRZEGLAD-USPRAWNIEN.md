@@ -35,6 +35,8 @@ Potwierdzone błędy: adres właściciela zakodowany w D1; różne formaty dat o
 
 - Lokalne testy obejmują rzeczywistą bazę PostgreSQL oraz transakcje SQLite, kwarantannę, atomową rezerwację miejsca i zgodność pól CMS z migracjami D1.
 - GitHub Actions dla `d427278`: oba zadania `check` i `integration` zakończone sukcesem, run `41490300287`. Chromium: formularz i katalog, axe: brak naruszeń w kontrolowanych widokach.
+- Końcowy commit kodu `dd2871e`: GitHub Actions `41491889826` zakończone sukcesem. Lokalnie przeszły wszystkie 33 testy, w tym 4 integracyjne z PostgreSQL.
+- Wdrożona wersja Cloudflare: `cf34ff94-a24e-4493-99bd-080293cd508b`. Po wdrożeniu baza potwierdziła wykonanie retencji (`cleanup: ok`, 02.11.2026 17:35:51 UTC) oraz połączenie skanera (17:34:15 UTC). To kontrola działania w tej chwili, nie stały monitoring dostępności.
 - Lighthouse CI, po 3 próby: mediana LCP strony głównej 2,714 s, katalogu 2,865 s; CLS 0,0004–0,0009; TBT 54–188 ms; około 427–433 KB transferu. To pomiar lokalnego serwera produkcyjnego w CI z pustym katalogiem, nie fizycznego telefonu ani publicznej domeny z przyszłymi zdjęciami.
 - Usunięto błędny wspólny fallback ładowania powodujący CLS około 0,717; mała drukarka pozostaje loaderem modelu. Nagłówek LCP jest widoczny od pierwszego renderowania.
 - Cloudflare: migracje 0002/0003 zastosowane po prywatnej kopii. Odtworzenie SQL w pustym SQLite: integralność OK, brak błędów kluczy obcych. Osobno sprawdzono zachowanie transakcji przy błędzie kolejki.
