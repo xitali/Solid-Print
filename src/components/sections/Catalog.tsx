@@ -11,6 +11,9 @@ export default async function Catalog({query}:SectionProps){
     const products = selectProducts(all, { q: query.q, category: query.category, application: query.application })
     const categories = [...new Set(all.map((p) => p.category).filter(Boolean))] as string[]
     const applications = [...new Set(all.flatMap((p) => p.applications?.map((a) => a.value) || []))]
+    const filters = { q: query.q, category: query.category, application: query.application }
+    const labels = { q: 'Szukaj', category: 'Kategoria', application: 'Zastosowanie' }
+    const active = (Object.keys(filters) as (keyof typeof filters)[]).filter((key) => filters[key])
 
     return (
       <>
@@ -20,7 +23,7 @@ export default async function Catalog({query}:SectionProps){
           description="Przedmioty zaprojektowane w Solid Print. Wybierz projekt, poznaj szczegóły i zapytaj o wykonanie dla siebie."
         />
         <div className="container page-content">
-          <form className="filter-bar" action="/projekty">
+          {(all.length > 0 || active.length > 0) && <form className="filter-bar" action="/projekty">
             <div className="field">
               <label htmlFor="catalog-query">Szukaj projektu</label>
               <input
@@ -32,7 +35,7 @@ export default async function Catalog({query}:SectionProps){
                 defaultValue={query.q}
               />
             </div>
-            <div className="field">
+            {(categories.length > 1 || query.category) && <div className="field">
               <label htmlFor="catalog-category">Kategoria</label>
               <select id="catalog-category" name="category" className="select" defaultValue={query.category || ''}>
                 <option value="">Wszystkie kategorie</option>
@@ -40,8 +43,8 @@ export default async function Catalog({query}:SectionProps){
                   <option key={c}>{c}</option>
                 ))}
               </select>
-            </div>
-            <div className="field">
+            </div>}
+            {(applications.length > 1 || query.application) && <div className="field">
               <label htmlFor="catalog-application">Zastosowanie</label>
               <select
                 id="catalog-application"
@@ -54,19 +57,23 @@ export default async function Catalog({query}:SectionProps){
                   <option key={a}>{a}</option>
                 ))}
               </select>
-            </div>
+            </div>}
             <button className="btn btn--primary" type="submit">
               <Search size={17} />
               <span>Szukaj</span>
             </button>
-          </form>
+          </form>}
 
-          <div className="filter-count">
+          {(all.length > 0 || active.length > 0) && <div className="filter-count">
             <span>
               {products.length} {products.length === 1 ? 'projekt' : 'projektów'}
             </span>
-            <Link href="/projekty">Wyczyść filtry ↗</Link>
-          </div>
+            {!!active.length && <Link href="/projekty">Wyczyść filtry ↗</Link>}
+          </div>}
+          {!!active.length && <ul className="filter-chips" aria-label="Aktywne filtry">{active.map((key) => {
+            const remaining = new URLSearchParams(active.filter((other) => other !== key).map((other) => [other, filters[other]!]))
+            return <li key={key}><Link href={remaining.size ? `/projekty?${remaining}` : '/projekty'} aria-label={`Usuń filtr ${labels[key]}: ${filters[key]}`}>{labels[key]}: {filters[key]} <span aria-hidden="true">×</span></Link></li>
+          })}</ul>}
 
           {products.length ? (
             <div className="product-grid">

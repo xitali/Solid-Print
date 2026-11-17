@@ -6,18 +6,18 @@ type SectionProps = {section:string;query:Record<string,string|undefined>;settin
 export default async function SearchSection({query}:SectionProps){
 
     const q = (query.q || '').trim().toLocaleLowerCase('pl')
-    const results = await Promise.all(
-      ['products', 'services', 'materials', 'articles'].map(async (collection) =>
+    const results = q ? await Promise.all(
+      ['products', 'services', 'materials', 'articles', 'projects'].map(async (collection) =>
         (await list<{ title: string; slug: string; description: string }>(collection)).map((d) => ({
           ...d,
           collection,
         }))
       )
-    )
+    ) : []
     const found = q
       ? results
           .flat()
-          .filter((d) => `${d.title} ${d.description}`.toLocaleLowerCase('pl').includes(q))
+          .filter((d) => `${d.title} ${d.description || ''}`.toLocaleLowerCase('pl').includes(q))
       : []
 
     const urls: Record<string, string> = {
@@ -25,12 +25,14 @@ export default async function SearchSection({query}:SectionProps){
       services: 'uslugi',
       materials: 'materialy',
       articles: 'poradnik',
+      projects: 'realizacje',
     }
     const labels: Record<string, string> = {
       products: 'PROJEKT',
       services: 'USŁUGA',
       materials: 'MATERIAŁ',
       articles: 'PORADNIK',
+      projects: 'REALIZACJA',
     }
 
     return (
@@ -52,11 +54,12 @@ export default async function SearchSection({query}:SectionProps){
             </button>
           </form>
 
+          {!!q && <p className="filter-count" aria-live="polite">Liczba wyników: {found.length}</p>}
           {found.map((d, i) => (
             <Link className="search-result" key={i} href={`/${urls[d.collection]}/${d.slug}`}>
               <span className="mono">{labels[d.collection]}</span>
               <h2>{d.title}</h2>
-              <p>{d.description}</p>
+              {d.description && <p className="catalog-summary">{d.description}</p>}
             </Link>
           ))}
 
@@ -66,6 +69,11 @@ export default async function SearchSection({query}:SectionProps){
               text="Spróbuj innej frazy lub opisz swój pomysł w zapytaniu."
             />
           )}
+          {!found.length && <nav className="catalog-actions search-shortcuts" aria-label="Przeglądaj kategorie">
+            <Link className="text-link" href="/uslugi">Usługi</Link>
+            <Link className="text-link" href="/materialy">Materiały</Link>
+            <Link className="text-link" href="/realizacje">Realizacje</Link>
+          </nav>}
         </div>
       </>
     )

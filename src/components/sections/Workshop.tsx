@@ -23,8 +23,7 @@ export default async function Workshop({settings:s}:SectionProps){
                   wykonaniem, żeby przejść od pomysłu do gotowego przedmiotu.
                 </p>
                 <p>
-                  Pracownia dysponuje dwiema drukarkami i zapleczem komputerowym do projektowania. Szczegóły sprzętu
-                  i dostępnych technologii uzupełnimy na podstawie danych właściciela.
+                  Możesz przynieść gotowy model, szkic albo sam opis. Przed wykonaniem wspólnie ustalimy wymiary, warunki pracy przedmiotu i wymagania dotyczące wyglądu.
                 </p>
               </>
             )}
@@ -39,7 +38,7 @@ export default async function Workshop({settings:s}:SectionProps){
             ) : (
               <TechnicalArt small />
             )}
-            {s.workshopImages?.map((v, i) => (
+            {s.workshopImages?.filter((v) => v.image?.url).map((v, i) => (
               <img
                 key={i}
                 src={v.image.url}

@@ -14,6 +14,7 @@ export const Website: GlobalConfig = {
     update: owner,
   },
   fields: [
+    { name: 'readiness', type: 'ui', admin: { components: { Field: '/components/admin/SiteReadiness#SiteReadiness' } } },
     {
       type: 'tabs',
       tabs: [

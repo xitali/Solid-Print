@@ -7,6 +7,8 @@ export default async function Quote({query,settings:s}:SectionProps){
 
     const [products, materials] = await Promise.all([list<Product>('products'), list<Material>('materials')])
     const product = products.find((p) => String(p.id) === query.product)
+    const material = materials.find((m) => m.available && m.slug === query.material)
+    const color = material?.colorSamples?.find((sample) => sample.name === query.color)?.name
     return (
       <div className="quote-page">
         <header className="page-head container">
@@ -22,10 +24,13 @@ export default async function Quote({query,settings:s}:SectionProps){
         </header>
         <div className="container">
           <QuoteForm
+            key={JSON.stringify([query.type, product?.id, material?.id, color, query.variant, query.quantity, query.application])}
             initialType={query.type}
             product={product}
             variant={query.variant}
             materials={materials}
+            initialMaterial={material?.title}
+            initialColor={color}
             pickupEnabled={s.pickupEnabled}
             application={query.application}
             initialQuantity={Number(query.quantity) || 1}

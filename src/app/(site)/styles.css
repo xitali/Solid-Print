@@ -146,6 +146,8 @@ p { color: var(--muted); }
 .btn:focus-visible, .button:focus-visible { outline: 3px solid var(--ink); outline-offset: 3px; }
 .btn[disabled], .button[disabled] { opacity: .45; cursor: not-allowed; transform: none; }
 .btn svg, .button svg { transition: transform 0.2s ease; }
+.btn svg, .button svg { flex-shrink: 0; }
+.page-content .btn { max-inline-size: 100%; white-space: normal; line-height: 1.25; padding-block: 10px; }
 .btn:hover svg, .button:hover svg { transform: translate(2px, -2px); }
 
 .btn--primary, .button:not(.button-outline):not(.btn--secondary):not(.btn--ghost) {
@@ -1575,6 +1577,9 @@ p { color: var(--muted); }
   align-items: center;
   justify-content: center;
 }
+.detail-grid > * { min-inline-size: 0; }
+.product-detail-info { overflow-wrap: anywhere; }
+#zamowienie { scroll-margin-top: 92px; }
 .product-gallery-main button {
   width: 100%;
   height: 100%;
@@ -1586,7 +1591,7 @@ p { color: var(--muted); }
 .product-gallery-main img {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
 }
 .product-no-image {
   display: flex;
@@ -2155,6 +2160,7 @@ input[type="date"] {
   font-size: 14px;
   color: var(--ink-soft);
 }
+.dropzone__local-note { display: block; margin-top: 4px; font-size: .875rem; color: var(--ink-soft); }
 .dropzone__formats {
   margin-top: var(--s-3);
   font-size: 13px;
@@ -2706,10 +2712,37 @@ input[type="date"] {
   font-size: 11px;
   color: var(--muted);
 }
-.footer-bottom > div { display: flex; gap: 24px; }
+.footer-bottom > div { display: flex; flex-wrap: wrap; gap: 8px 20px; min-width: 0; }
+.footer-bottom { flex-wrap: wrap; padding-block: 14px; }
+.header-search { display: grid; place-items: center; min-width: 38px; min-height: 40px; }
+.mobile-nav[hidden] { display: none; }
+.hero-example { display: inline-flex; gap: 12px; align-items: center; max-width: 100%; padding: 8px 12px 8px 8px; margin-top: 18px; background: var(--white); border: 1px solid var(--line); border-radius: var(--radius-btn); color: var(--ink); text-decoration: none; }
+.hero-example img { width: 80px; height: 48px; object-fit: cover; border-radius: 5px; }
+.hero-example span { min-width: 0; display: grid; gap: 2px; overflow-wrap: anywhere; }
+.hero-example small { color: var(--ink-soft); }
+.hero-example:hover { border-color: var(--accent); }
+.hero-example svg { flex: none; }
+.catalog-summary { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.catalog-actions { display: flex; align-items: start; gap: 4px 16px; flex-wrap: wrap; margin-top: auto; }
+.catalog-actions svg { flex: none; }
+.material-sample-link { display: inline-flex; align-items: center; gap: var(--s-2); border-radius: 8px; padding: 4px; min-height: 44px; text-decoration: none; }
+.material-sample-link:hover { background: var(--paper); text-decoration: underline; }
+.material-limitations { margin-bottom: var(--s-3); }
+.material-limitations summary { font-weight: 600; cursor: pointer; padding-block: 8px; }
+.material-limitations p { margin: 6px 0 0; white-space: pre-line; }
+.business-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(260px, 100%), 1fr)); gap: var(--s-4); margin-bottom: var(--s-6); }
+.business-card { padding: var(--s-5); background: var(--paper); border: 1px solid var(--line); border-radius: var(--radius-card); }
+.business-card > svg { color: var(--accent); }
+.business-card h2 { font-size: 1.3rem; margin: 8px 0; }
+.business-card p { margin-bottom: 8px; }
+.filter-chips { display: flex; flex-wrap: wrap; gap: 8px; padding: 0; margin: 0 0 var(--s-5); list-style: none; }
+.filter-chips a { display: inline-block; padding: 6px 12px; background: var(--paper); border: 1px solid var(--line); border-radius: 999px; overflow-wrap: anywhere; }
+.search-shortcuts { margin-top: var(--s-4); }
+.article-grid { grid-template-columns: repeat(auto-fill, minmax(min(320px, 100%), 1fr)); }
 
 /* Responsywność */
 @media (max-width: 1023px) {
+  .header-search { display: none; }
   .desktop-nav { display: none; }
   .menu-toggle { display: flex; }
   .mobile-nav {
@@ -2756,7 +2789,7 @@ input[type="date"] {
 }
 
 @media (max-width: 767px) {
-  body { padding-bottom: 64px; }
+  body:has(.mobile-contact-bar) { padding-bottom: calc(64px + env(safe-area-inset-bottom)); }
   .site-header { height: 74px; }
   .header-actions > .button { display: none; }
   .mobile-contact-bar {
@@ -2793,6 +2826,9 @@ input[type="date"] {
   .section-title-row { align-items: flex-start; flex-direction: column; gap: 20px; }
   .hero-buttons { flex-wrap: wrap; }
   .footer-grid { grid-template-columns: 1fr 1fr; }
+  .footer-bottom > div { flex-basis: 100%; order: -1; }
+  .detail-grid { grid-template-columns: minmax(0, 1fr); }
+  .hero h1 { font-size: clamp(38px, 11vw, 48px); }
 }
 
 /* Karta zgody w formularzu (RODO / zgoda na kontakt) */

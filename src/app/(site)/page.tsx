@@ -26,6 +26,8 @@ export default async function Home() {
     homeItems<FAQ>('faqs', 5),
     homeItems<Article>('articles', 3),
   ])
+  const example = projects[0]
+  const exampleImage = example?.cardImage?.url ? example.cardImage : example?.image
 
 
   return (
@@ -70,6 +72,11 @@ export default async function Home() {
                 Gotowe projekty <ArrowUpRight size={18} />
               </Link>
             </div>
+            {example && <Link href={`/realizacje/${example.slug}`} className="hero-example" prefetch={false}>
+              {exampleImage?.url && <img src={exampleImage.url} alt="" width={80} height={48} loading="lazy" />}
+              <span><small>Zrealizowany projekt</small><strong>{example.title}</strong></span>
+              <ArrowUpRight size={17} aria-hidden="true" />
+            </Link>}
 
 
           </div>

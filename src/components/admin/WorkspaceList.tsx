@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import { useState } from 'react'
 import { usePathname, useSearchParams } from 'next/navigation'
 import { BookOpen, Box, CircleHelp, FileStack, Images, Inbox, Layers3, Mail, Shapes, Users, Wrench } from 'lucide-react'
 import type { BeforeListTableClientProps } from 'payload'
@@ -23,15 +24,18 @@ const lists = {
 export function WorkspaceList({ collectionSlug }: BeforeListTableClientProps) {
   const pathname = usePathname()
   const params = useSearchParams()
+  const [fullTable, setFullTable] = useState(false)
+  const [gallery, setGallery] = useState(false)
   const base = `/admin/collections/${collectionSlug}`
   const list = lists[collectionSlug as keyof typeof lists]
   if (!list || pathname !== base) return null
 
   const { Icon, filters } = list
   const filterKeys = Array.from(params.keys()).filter((key) => key.startsWith('where['))
+  const operational = ['inquiries', 'quote-files', 'outbox'].includes(collectionSlug)
 
   return (
-    <nav className="sp-list-views" aria-label="Szybkie widoki listy">
+    <nav className="sp-list-views" aria-label="Szybkie widoki listy" data-full-table={fullTable} data-media-gallery={gallery}>
       <Icon size={18} aria-hidden="true" />
       <Link href={base} prefetch={false} aria-current={!filterKeys.length && !params.get('search') ? 'page' : undefined}>Wszystkie</Link>
       {filters.map(([field, value, label]) => {
@@ -39,6 +43,8 @@ export function WorkspaceList({ collectionSlug }: BeforeListTableClientProps) {
         const active = filterKeys.length === 1 && params.get(key) === value && !params.get('search')
         return <Link key={label} href={`${base}?${new URLSearchParams({ [key]: value })}`} prefetch={false} aria-current={active ? 'page' : undefined}>{label}</Link>
       })}
+      {operational && <button type="button" className="sp-full-table" aria-pressed={fullTable} onClick={() => setFullTable(!fullTable)}>Pełna tabela</button>}
+      {collectionSlug === 'media' && <button type="button" aria-pressed={gallery} onClick={() => setGallery(!gallery)}>Galeria zdjęć</button>}
     </nav>
   )
 }

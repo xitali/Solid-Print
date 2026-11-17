@@ -30,7 +30,7 @@ export const Inquiries: CollectionConfig = {
   admin: {
     group: 'Sprzedaż',
     useAsTitle: 'number',
-    defaultColumns: ['number', 'status', 'type', 'name', 'company', 'quantity', 'files', 'createdAt'],
+    defaultColumns: ['number', 'status', 'name', 'updatedAt', 'type', 'company', 'quantity', 'files'],
     listSearchableFields: ['number', 'name', 'email', 'company', 'description'],
     description: 'Najnowsze zapytania na górze. Status zmieniasz w prawej kolumnie bocznej.',
   },

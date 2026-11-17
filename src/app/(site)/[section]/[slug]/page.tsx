@@ -6,7 +6,7 @@ import { ProductDetails } from '@/components/ProductDetails'
 import { PageIntro, Paragraphs } from '@/components/UI'
 import { SectionLabel } from '@/components/Brand'
 import { StructuredData } from '@/components/StructuredData'
-import { MaterialOptions } from '@/components/MaterialOptions'
+import { MaterialOptions, materialQuoteHref } from '@/components/MaterialOptions'
 import { ServiceExtraDetails } from '@/components/ServiceExtraDetails'
 import type { Product, Project, Article, Service, Material } from '@/lib/types'
 
@@ -100,8 +100,17 @@ export default async function Page({ params }: Args) {
                 {[d.material, d.dimensions].filter(Boolean).join(' / ')}
               </p>
             </>
+          ) : section === 'materialy' ? (
+            <>
+              {!!d.applications?.length && <section><h2>Zastosowania</h2><ul>{d.applications.map((item, index) => <li key={index}>{item.value}</li>)}</ul></section>}
+              {d.limitations && <section><h2>Ograniczenia</h2><ul>{d.limitations.split('\n').filter(Boolean).map((line, index) => <li key={index}>{line}</li>)}</ul></section>}
+            </>
           ) : (
-            <Paragraphs text={d.body || d.limitations} />
+            <>
+              {section === 'uslugi' && d.body && <h2>Jak wygląda usługa</h2>}
+              <Paragraphs text={d.body} />
+              {section === 'uslugi' && d.applications && <section><h2>Zastosowania</h2><Paragraphs text={d.applications} /></section>}
+            </>
           )}
 
           {d.relatedProjects?.length ? (
@@ -126,7 +135,7 @@ export default async function Page({ params }: Args) {
           {section === 'uslugi' && <ServiceExtraDetails service={d} detailPage />}
 
           <div style={{ marginTop: 'var(--s-7)' }}>
-            <Link href={`/wycena?type=${d.kind || 'design'}`} className="btn btn--primary">
+            <Link href={section === 'materialy' ? materialQuoteHref(d) : `/wycena?type=${d.kind || 'design'}`} className="btn btn--primary">
               <span>Porozmawiajmy o Twoim projekcie</span>
               <ArrowUpRight size={18} />
             </Link>

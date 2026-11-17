@@ -36,6 +36,12 @@ describe('trzy ścieżki klienta', () => {
     expect(validateInquiry({...base,type:'product'}).success).toBe(false)
     expect(validateInquiry({...base,type:'product',productId:'12'}).success).toBe(true)
   })
+  it('pozwala wycenić gotowy produkt bez uwag i nadal wymaga opisu dla samodzielnej usługi', () => {
+    const product = validateInquiry({ ...base, type: 'product', productId: '12', description: '' })
+    expect(product.success).toBe(true)
+    if (product.success) expect(product.data.description).toBe('')
+    expect(validateInquiry({ ...base, type: 'design', description: '' }).success).toBe(false)
+  })
   it('normalizuje NIP i telefon, odrzuca fikcyjny NIP i niepoprawny telefon', () => {
     const result = validateInquiry({...base,type:'design', nip:'526-025-09-95',phone:'+48 123 456 789'})
     expect(result.success).toBe(true)

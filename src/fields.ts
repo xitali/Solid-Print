@@ -70,7 +70,7 @@ export const publicationField: Field = {
   label: 'Opublikowane',
   type: 'checkbox',
   defaultValue: false,
-  admin: { position: 'sidebar' },
+  admin: { position: 'sidebar', components: { Cell: '/components/admin/CatalogCells#PublicationCell' } },
 }
 
 export const applicationsField: Field = {

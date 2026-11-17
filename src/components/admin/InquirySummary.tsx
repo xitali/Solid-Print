@@ -52,7 +52,7 @@ export function InquirySummary() {
           {company && <span style={{ fontWeight: 400, opacity: 0.85 }}> · {company}</span>}
         </div>
         {number && (
-          <span style={{ fontFamily: 'monospace', fontWeight: 600, color: 'var(--theme-accent, #c2410c)' }}>
+          <span style={{ fontFamily: 'monospace', fontWeight: 600, color: 'var(--sp-accent)' }}>
             {number}
           </span>
         )}
@@ -64,7 +64,7 @@ export function InquirySummary() {
             <span style={{ opacity: 0.65 }}>E-mail: </span>
             <a
               href={`mailto:${email}?subject=${encodeURIComponent(`Solid Print — zapytanie ${number}`)}`}
-              style={{ color: 'var(--theme-accent, #c2410c)', textDecoration: 'underline' }}
+              style={{ color: 'var(--sp-accent)', textDecoration: 'underline' }}
             >
               {email}
             </a>
@@ -75,7 +75,7 @@ export function InquirySummary() {
             <span style={{ opacity: 0.65 }}>Tel: </span>
             <a
               href={`tel:${cleanPhone}`}
-              style={{ color: 'var(--theme-accent, #c2410c)', textDecoration: 'underline' }}
+              style={{ color: 'var(--sp-accent)', textDecoration: 'underline' }}
             >
               {phone}
             </a>

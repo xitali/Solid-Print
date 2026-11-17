@@ -1,5 +1,4 @@
 import { PageIntro,Process } from '@/components/UI'
-import { ServiceExtraDetails } from '@/components/ServiceExtraDetails'
 import { list } from '@/lib/cms'
 import type { Service } from '@/lib/types'
 import { ArrowUpRight,Boxes,FileBox,Layers,PenTool } from 'lucide-react'
@@ -51,35 +50,40 @@ export default async function Services({section}:SectionProps){
           }
         />
         <div className="container page-content">
+          {section === 'dla-firm' && <div className="business-grid" aria-label="Ścieżki współpracy">
+            <section className="business-card"><Layers size={25} aria-hidden="true" /><h2>Prototyp</h2><p>Opisz, co chcesz sprawdzić, gdzie element ma pasować i jakie ma mieć wymiary.</p>
+              <Link className="text-link" href="/wycena?type=design&application=Prototyp">Opisz prototyp <ArrowUpRight size={16} /></Link></section>
+            <section className="business-card"><Boxes size={25} aria-hidden="true" /><h2>Krótka seria</h2><p>Podaj liczbę sztuk, zastosowanie, oczekiwany termin i informację, czy masz model.</p>
+              <Link className="text-link" href="/wycena?type=design&application=Kr%C3%B3tka%20seria">Zapytaj o serię <ArrowUpRight size={16} /></Link></section>
+          </div>}
           <div className="service-grid">
-            {(services.length ? services : defaults).map((v, i) => {
-              const Icon = [PenTool, FileBox, Layers, Boxes][i % 4]
+            {(services.length ? services : defaults).map((v) => {
+              const Icon = v.kind === 'print' ? FileBox : PenTool
               return (
                 <article key={v.id} className="service-card">
-                  <span className="mono">USŁUGA / 0{i + 1}</span>
+                  <span className="mono">{v.kind === 'print' ? 'DRUK Z MODELU' : 'PROJEKTOWANIE'}</span>
                   <Icon size={30} strokeWidth={1.15} />
                   <h2>{v.title}</h2>
-                  <p>{v.description}</p>
-                  {v.body && <div className="service-details">{v.body}</div>}
+                  <p className="catalog-summary">{v.description}</p>
                   {v.applications && (
-                    <div className="service-details">
+                    <div className="service-details catalog-summary">
                       <strong>Zastosowania</strong>
                       <br />
                       {v.applications}
                     </div>
                   )}
-                  <ServiceExtraDetails service={v} />
-                  <Link className="text-link" href={`/wycena?type=${v.kind}`}>
-                    Porozmawiajmy o projekcie <ArrowUpRight size={17} />
-                  </Link>
+                  <div className="catalog-actions">
+                    {!!services.length && <Link className="text-link" href={`/uslugi/${v.slug}`}>Zobacz szczegóły <ArrowUpRight size={16} /></Link>}
+                    <Link className="text-link" href={`/wycena?type=${v.kind}`}>Zapytaj o wycenę <ArrowUpRight size={16} /></Link>
+                  </div>
                 </article>
               )
             })}
           </div>
-          <div className="notice">
+          {section === 'dla-firm' && <div className="notice">
             Zakres wykonania, dobór materiału oraz terminy ustalamy po zapoznaniu się z projektem. W zapytaniu firmowym
             możesz podać nazwę firmy, NIP oraz planowaną liczbę sztuk.
-          </div>
+          </div>}
         </div>
         <Process />
       </>

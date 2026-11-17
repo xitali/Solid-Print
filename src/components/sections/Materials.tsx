@@ -1,5 +1,5 @@
 import { EmptyState,PageIntro } from '@/components/UI'
-import { MaterialOptions } from '@/components/MaterialOptions'
+import { MaterialOptions, materialQuoteHref } from '@/components/MaterialOptions'
 import { list } from '@/lib/cms'
 import type { Material } from '@/lib/types'
 import { ArrowUpRight } from 'lucide-react'
@@ -21,7 +21,7 @@ export default async function Materials({query}:SectionProps){
           {all.length > 0 && (
             <form action="/materialy" className="filter-bar">
               <div className="field">
-                <label htmlFor="material-group">Zastosowanie</label>
+                <label htmlFor="material-group">Grupa materiału</label>
                 <select name="group" id="material-group" className="select" defaultValue={query.group || ''}>
                   <option value="">Wszystkie grupy</option>
                   <option value="decorative">Dekoracyjne</option>
@@ -49,13 +49,17 @@ export default async function Materials({query}:SectionProps){
             </form>
           )}
 
+          {all.length > 0 && <div className="filter-count" aria-live="polite">
+            <span>Materiały: {materials.length} z {all.length}</span>
+            {(query.group || query.available) && <Link href="/materialy">Wyczyść filtry</Link>}
+          </div>}
           {materials.length ? (
             <div className="material-grid">
               {materials.map((m) => (
                 <article className="material-card" key={m.id}>
                   <span className="mono">{m.available ? 'DOSTĘPNY' : 'ZAPYTAJ O DOSTĘPNOŚĆ'}</span>
                   <h2>{m.title}</h2>
-                  <p>{m.description}</p>
+                  <p className="catalog-summary">{m.description}</p>
                   <dl>
                     {m.applications?.length ? (
                       <div>
@@ -63,17 +67,13 @@ export default async function Materials({query}:SectionProps){
                         <dd>{m.applications.map((a) => a.value).join(', ')}</dd>
                       </div>
                     ) : null}
-                    {m.limitations && (
-                      <div>
-                        <dt>Ograniczenia</dt>
-                        <dd>{m.limitations}</dd>
-                      </div>
-                    )}
                     <MaterialOptions material={m} />
                   </dl>
-                  <Link href="/wycena" className="text-link">
-                    Zapytaj o wykonanie <ArrowUpRight size={16} />
-                  </Link>
+                  {m.limitations && <details className="material-limitations"><summary>Ograniczenia</summary><p>{m.limitations}</p></details>}
+                  <div className="catalog-actions">
+                    <Link href={`/materialy/${m.slug}`} className="text-link">Zobacz szczegóły <ArrowUpRight size={16} /></Link>
+                    <Link href={materialQuoteHref(m)} className="text-link">Zapytaj o wykonanie <ArrowUpRight size={16} /></Link>
+                  </div>
                 </article>
               ))}
             </div>

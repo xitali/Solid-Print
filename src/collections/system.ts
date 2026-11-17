@@ -25,8 +25,8 @@ export const systemCollections:CollectionConfig[]=[{
         'Pliki wycen',
         [
           { name: 'name', label: 'Nazwa pliku', type: 'text', required: true },
-          { name: 'size', label: 'Rozmiar w bajtach', type: 'number', required: true },
-          { name: 'kind', label: 'Typ', type: 'select', options: ['model', 'reference'], required: true },
+          { name: 'size', label: 'Rozmiar', type: 'number', required: true, admin: { components: { Cell: '/components/admin/CatalogCells#FileSizeCell' } } },
+          { name: 'kind', label: 'Typ', type: 'select', options: [{ value: 'model', label: 'Model 3D' }, { value: 'reference', label: 'Załącznik' }], required: true },
           { name: 'sessionId', type: 'text', index: true, admin: { hidden: true } },
           { name: 'objectKey', type: 'text', admin: { hidden: true } },
           { name: 'contentHash', label: 'SHA-256 zawartości', type: 'text', admin: { readOnly: true } },
@@ -35,6 +35,7 @@ export const systemCollections:CollectionConfig[]=[{
             label: 'Stan',
             type: 'select',
             defaultValue: 'pending',
+            admin: { components: { Cell: '/components/admin/CatalogCells#OperationalStatusCell' } },
             options: [
               { label: 'Oczekiwanie na przesłanie', value: 'pending' },
               { label: 'Przesyłanie', value: 'uploading' },
@@ -56,7 +57,7 @@ export const systemCollections:CollectionConfig[]=[{
       admin: {
         group: 'Sprzedaż',
         useAsTitle:'name',
-        defaultColumns: ['name', 'kind', 'size', 'status', 'createdAt'],
+        defaultColumns: ['name', 'status', 'kind', 'size', 'createdAt'],
       },
     },
 {
@@ -86,17 +87,18 @@ export const systemCollections:CollectionConfig[]=[{
             label: 'Stan',
             type: 'select',
             defaultValue: 'pending',
-            options: ['pending', 'sent', 'failed'],
+            options: [{ value: 'pending', label: 'Oczekuje' }, { value: 'sent', label: 'Wysłano' }, { value: 'failed', label: 'Błąd' }],
+            admin: { components: { Cell: '/components/admin/CatalogCells#OperationalStatusCell' } },
           },
-          { name: 'attempts', type: 'number', defaultValue: 0 },
-          { name: 'nextAttemptAt', type: 'date' },
-          { name: 'lastError', type: 'text' },
+          { name: 'attempts', label: 'Próby', type: 'number', defaultValue: 0 },
+          { name: 'nextAttemptAt', label: 'Następna próba', type: 'date' },
+          { name: 'lastError', label: 'Ostatni błąd', type: 'text' },
         ],
         'System'
       ),
       admin: {
         group: 'System',
-        defaultColumns: ['to', 'subject', 'state', 'attempts'],
+        defaultColumns: ['subject', 'state', 'attempts', 'to', 'nextAttemptAt', 'lastError'],
       },
     },
 {

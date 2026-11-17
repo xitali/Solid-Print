@@ -31,8 +31,7 @@ export default async function Contact({settings:s}:SectionProps){
               )}
               {!s.phone && !s.email && (
                 <div className="notice">
-                  Bezpośrednie dane kontaktowe zostaną uzupełnione przed publikacją strony. Wersja lokalna umożliwia
-                  przetestowanie formularza.
+                  Skorzystaj z formularza kontaktowego. Opisz, czego potrzebujesz, i podaj adres e-mail do odpowiedzi.
                 </div>
               )}
               {s.hours && (

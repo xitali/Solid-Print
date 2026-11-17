@@ -4,6 +4,8 @@ import Link from 'next/link'
 import { Suspense } from 'react'
 import type { AdminViewServerProps } from 'payload'
 
+const checkDate = new Intl.DateTimeFormat('pl-PL', { timeZone: 'Europe/Warsaw', dateStyle: 'short', timeStyle: 'short' })
+
 export function OperationsView(props: AdminViewServerProps) {
   const { req, visibleEntities } = props.initPageResult
   if (req.user?.role !== 'owner') return null
@@ -43,9 +45,14 @@ export async function Operations() {
           <small>{m.note}</small>
         </div>
       })}</div>
-      <p>Skaner: <strong>{scannerRecent?'połączony':'brak świeżego połączenia — pliki pozostają w kwarantannie'}</strong>{scanner&&` (ostatnio ${new Date(scanner.updated_at).toLocaleString('pl-PL',{timeZone:'Europe/Warsaw'})})`}</p>
-      <p>Retencja: {cleanup?`${JSON.parse(cleanup.value).status==='ok'?'ostatnie wykonanie poprawne':'błąd — sprawdź logi'} · ${new Date(cleanup.updated_at).toLocaleString('pl-PL',{timeZone:'Europe/Warsaw'})}`:'brak potwierdzonego wykonania'}</p>
-      <p>Poczta: {process.env.MAIL_API_URL?'adapter HTTP skonfigurowany — sprawdź kolejkę':'niepodłączona; zapytania są zapisywane, wiadomości czekają w kolejce'}</p>
+      <div className="sp-admin-grid" aria-label="Stan usług">
+        <section className="sp-admin-card"><h4>Skaner</h4><p>{scannerRecent ? 'Połączony' : 'Pliki pozostają w kwarantannie'}</p>
+          <small>{scanner ? `Ostatni kontakt ${checkDate.format(new Date(scanner.updated_at))}` : 'Brak pomiaru'}</small></section>
+        <section className="sp-admin-card"><h4>Retencja</h4><p>{cleanup ? (JSON.parse(cleanup.value).status === 'ok' ? 'Ostatnie wykonanie poprawne' : 'Błąd wykonania') : 'Brak potwierdzonego wykonania'}</p>
+          {cleanup && <small>{checkDate.format(new Date(cleanup.updated_at))}</small>}</section>
+        <section className="sp-admin-card"><h4>Poczta</h4><p>{process.env.MAIL_API_URL ? 'Adapter HTTP skonfigurowany' : 'Wiadomości czekają w kolejce'}</p>
+          <Link href="/admin/collections/outbox" prefetch={false}>Otwórz kolejkę</Link></section>
+      </div>
       <p className="sp-admin-notice">To wskaźniki tej witryny. R2 może naliczać opłaty po przekroczeniu limitów całego konta, również za operacje. Ruch Workera i operacje D1/R2 sprawdzaj w panelu Cloudflare; brak tych pomiarów tutaj nie oznacza 0%.</p>
       <a href="https://dash.cloudflare.com/" target="_blank" rel="noreferrer">Otwórz zużycie konta Cloudflare ↗</a>
     </section>

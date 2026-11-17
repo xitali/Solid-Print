@@ -7,21 +7,24 @@ import { mediaId } from '@/lib/media-reference'
 export function CatalogPreview({ kind }: { kind: 'material' | 'service' | 'project' }) {
   const fields = useFormFields(([state]) => state)
   const [open, setOpen] = useState(false)
-  const [loaded, setLoaded] = useState<{ id: number; url: string; alt: string } | null>(null)
+  const [loaded, setLoaded] = useState<{ id: number; url: string; alt: string }[]>([])
   const id = kind === 'project' ? mediaId(fields.image?.value) : undefined
+  const thumbnail = kind === 'project' ? mediaId(fields.cardImage?.value) : undefined
 
   useEffect(() => {
-    if (!open || !id) return
+    if (!open || (!id && !thumbnail)) return
     const controller = new AbortController()
-    fetch(`/api/media/${id}?depth=0`, { signal: controller.signal })
-      .then(async (response) => {
-        if (!response.ok) return
+    Promise.all([...new Set([id, thumbnail])].map(async (media) => {
+      if (!media) return null
+      try {
+        const response = await fetch(`/api/media/${media}?depth=0`, { signal: controller.signal })
+        if (!response.ok) return null
         const { url, alt } = await response.json()
-        if (typeof url === 'string' && !controller.signal.aborted) setLoaded({ id, url, alt: alt || '' })
-      })
-      .catch(() => { /* The text preview remains available when media cannot be read. */ })
+        return typeof url === 'string' ? { id: media, url, alt: alt || '' } : null
+      } catch { return null }
+    })).then((images) => { if (!controller.signal.aborted) setLoaded(images.filter((image) => image !== null)) })
     return () => controller.abort()
-  }, [id, open])
+  }, [id, thumbnail, open])
 
   const text = (path: string) => {
     const value = fields[path]?.value
@@ -33,7 +36,12 @@ export function CatalogPreview({ kind }: { kind: 'material' | 'service' | 'proje
     <details className="sp-catalog-preview sp-admin-card" onToggle={(event) => setOpen(event.currentTarget.open)}>
       <summary>Podgląd karty · {fields.published?.value ? 'Opublikowane po zapisie' : 'Szkic'}</summary>
       {open && <article>
-        {kind === 'project' && id && loaded?.id === id && <img src={loaded.url} alt={loaded.alt || text('title')} />}
+        {kind === 'project' && id && <div className="sp-preview-images">
+          {[['Oryginał', id], ['Miniatura karty', thumbnail]].map(([label, imageId]) => {
+            const image = loaded.find((photo) => photo.id === imageId)
+            return <figure key={label}><figcaption>{label}</figcaption>{image ? <img src={image.url} alt={image.alt || text('title')} /> : <p>{imageId ? 'Zdjęcie wybrane' : 'Do przygotowania'}</p>}</figure>
+          })}
+        </div>}
         <h2>{text('title') || 'Tytuł karty'}</h2>
         <p>{text(kind === 'project' ? 'result' : 'description') || 'Tu pojawi się opis karty.'}</p>
         {kind === 'material' && <>

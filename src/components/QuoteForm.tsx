@@ -50,6 +50,8 @@ export function QuoteForm({
   pickupEnabled = false,
   application = '',
   initialQuantity = 1,
+  initialMaterial = 'Doradź mi',
+  initialColor = '',
   phone = '',
 }: {
   initialType?: string
@@ -59,6 +61,8 @@ export function QuoteForm({
   pickupEnabled?: boolean
   application?: string
   initialQuantity?: number
+  initialMaterial?: string
+  initialColor?: string
   phone?: string
 }) {
   const [type, setType] = useState<'print' | 'design' | 'product'>(
@@ -73,6 +77,8 @@ export function QuoteForm({
   const [preview, setPreview] = useState<Attachment | null>(null)
   const [fieldErrors, setFieldErrors] = useState<{ name?: string; email?: string; description?: string }>({})
   const [privacyAccepted, setPrivacyAccepted] = useState(false)
+  const [material, setMaterial] = useState(initialMaterial)
+  const colorOptions = materials.find((item) => item.title === material)?.colorSamples ?? []
 
   const state = useRef<SubmissionState>({ key: '', session: null })
   const formRef = useRef<HTMLFormElement>(null)
@@ -90,12 +96,12 @@ export function QuoteForm({
             | HTMLSelectElement
             | null
           if (el && typeof val === 'string' && !el.value) {
-            el.value = val
+            if (key !== 'color' || !initialColor) el.value = val
           }
         })
       }
     } catch {}
-  }, [])
+  }, [initialColor])
 
   // Pobranie pliku przekazanego ze strefy Hero na stronie głównej (sekcja 4.2)
   useEffect(() => {
@@ -173,7 +179,9 @@ export function QuoteForm({
         }
       }
       if (field === 'description') {
-        if (!value.trim()) {
+        if (type === 'product') {
+          delete next.description
+        } else if (!value.trim()) {
           next.description = 'Opis jest wymagany do przygotowania wyceny.'
         } else if (value.trim().length < 10) {
           next.description = 'Opis musi mieć przynajmniej 10 znaków.'
@@ -379,7 +387,7 @@ export function QuoteForm({
                   <p className="dropzone__hint">
                     Do 5 modeli · 100 MiB na plik · 250 MiB łącznie
                     <br />
-                    <span className="mono" style={{ fontSize: '11px', display: 'inline-block', marginTop: '4px', opacity: 0.85 }}>
+                    <span className="dropzone__local-note">
                       Pliki są wczytywane lokalnie. Przy odświeżeniu strony wybierz plik jeszcze raz.
                     </span>
                   </p>
@@ -530,14 +538,14 @@ export function QuoteForm({
                   : type === 'design'
                   ? 'Opisz swój pomysł lub wymagania'
                   : 'Dodatkowe uwagi do zamówienia'}{' '}
-                <span className="req">*</span>
+                {type === 'product' ? <span className="hint"> — opcjonalnie</span> : <span className="req">*</span>}
               </label>
               <textarea
                 id="description"
                 name="description"
                 className="textarea"
-                required
-                minLength={10}
+                required={type !== 'product'}
+                minLength={type === 'product' ? undefined : 10}
                 maxLength={10000}
                 defaultValue={application ? `Zastosowanie: ${application}. ` : ''}
                 placeholder={
@@ -546,16 +554,16 @@ export function QuoteForm({
                     : 'Opisz zastosowanie, ważne wymiary, oczekiwaną wytrzymałość i szczegóły, które pomogą dobrać parametry druku.'
                 }
                 onBlur={(e) => validateField('description', e.target.value)}
-                aria-invalid={fieldErrors.description ? 'true' : undefined}
-                aria-describedby={fieldErrors.description ? 'description-error' : 'description-hint'}
+                aria-invalid={type !== 'product' && fieldErrors.description ? 'true' : undefined}
+                aria-describedby={type !== 'product' && fieldErrors.description ? 'description-error' : 'description-hint'}
               />
-              {fieldErrors.description ? (
+              {type !== 'product' && fieldErrors.description ? (
                 <span id="description-error" className="error" role="alert">
                   {fieldErrors.description}
                 </span>
               ) : (
                 <span id="description-hint" className="hint">
-                  Minimum 10 znaków. Pomaga nam zrozumieć warunki pracy przedmiotu.
+                  {type === 'product' ? 'Dodaj wskazówki do wybranego wariantu, jeśli są potrzebne.' : 'Minimum 10 znaków. Opisz, w jakich warunkach przedmiot będzie używany.'}
                 </span>
               )}
             </div>
@@ -681,7 +689,7 @@ export function QuoteForm({
 
               <div className="field">
                 <label htmlFor="material">Materiał</label>
-                <select id="material" name="material" className="select" defaultValue="Doradź mi">
+                <select id="material" name="material" className="select" value={material} onChange={(event) => setMaterial(event.target.value)}>
                   <option value="Doradź mi">Doradź mi materiał</option>
                   {materials
                     .filter((m) => m.available)
@@ -699,9 +707,12 @@ export function QuoteForm({
                   id="color"
                   name="color"
                   className="input"
+                  defaultValue={initialColor}
+                  list={colorOptions.length ? 'material-color-options' : undefined}
                   placeholder="Doradź mi lub wpisz oczekiwania"
                   maxLength={100}
                 />
+                {!!colorOptions.length && <datalist id="material-color-options">{colorOptions.map(({ name }, index) => <option key={`${name}-${index}`} value={name} />)}</datalist>}
               </div>
 
               <div className="field full">

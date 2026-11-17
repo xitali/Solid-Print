@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, ViewTransition } from 'react'
+import { useRef, useState, ViewTransition } from 'react'
 import Link from 'next/link'
 import { Box, ArrowUpRight, X } from 'lucide-react'
 import type { Product } from '@/lib/types'
@@ -11,6 +11,7 @@ export function ProductDetails({ product: p }: { product: Product }) {
   const [expanded, setExpanded] = useState(false)
   const [variant, setVariant] = useState(p.variants?.[0]?.name || '')
   const [quantity, setQuantity] = useState(1)
+  const zoom = useRef<HTMLButtonElement>(null)
 
   const images = p.images || []
   const image = images[index]?.image
@@ -20,7 +21,7 @@ export function ProductDetails({ product: p }: { product: Product }) {
       <div>
         <ViewTransition name={`product-${p.id}`} default="none" share="sp-product"><div className="product-gallery-main corner-frame">
           {image?.url ? (
-            <button type="button" onClick={() => setExpanded(true)} aria-label="Powiększ zdjęcie produktu">
+            <button ref={zoom} type="button" onClick={() => setExpanded(true)} aria-label="Powiększ zdjęcie produktu">
               <img src={image.url} alt={image.alt || p.title} width={image.width} height={image.height} decoding="async" fetchPriority="high" />
             </button>
           ) : (
@@ -98,7 +99,7 @@ export function ProductDetails({ product: p }: { product: Product }) {
         )}
 
         {p.available ? (
-          <div className="product-order-box">
+          <div id="zamowienie" className="product-order-box">
             {p.priceFrom !== null && p.priceFrom !== undefined && (
               <p className="product-price">
                 od {new Intl.NumberFormat('pl-PL', { style: 'currency', currency: 'PLN' }).format(p.priceFrom)}{' '}
@@ -157,7 +158,7 @@ export function ProductDetails({ product: p }: { product: Product }) {
             </p>
           </div>
         ) : (
-          <div className="notice">
+          <div id="zamowienie" className="notice">
             Ten projekt prezentujemy jako realizację.{' '}
             <Link className="text-link" href="/wycena?type=design">
               Zapytaj o podobne rozwiązanie <ArrowUpRight size={15} />
@@ -167,7 +168,7 @@ export function ProductDetails({ product: p }: { product: Product }) {
       </div>
 
       {expanded && image?.url && (
-        <Modal className="image-modal" label="Powiększone zdjęcie" onClose={() => setExpanded(false)}>
+        <Modal className="image-modal" label="Powiększone zdjęcie" onClose={() => setExpanded(false)} returnFocus={zoom}>
           <div className="lightbox">
             <button autoFocus onClick={() => setExpanded(false)} aria-label="Zamknij powiększenie">
               <X />

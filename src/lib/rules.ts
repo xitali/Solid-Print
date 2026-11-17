@@ -110,12 +110,16 @@ export const inquirySchema = z.object({
   material: z.string().trim().max(100).default('Doradź mi'),
   color: z.string().trim().max(100).default('Doradź mi'),
   unit: z.enum(['mm', 'cm', 'm', 'unknown']).default('unknown'),
-  description: z.string().trim().min(10).max(10000),
+  description: z.string().trim().max(10000).default(''),
   deadline: z.string().max(80).optional().default(''),
   delivery: z.enum(['shipping', 'pickup', 'discuss']).default('discuss'),
   productId: z.string().max(50).optional(),
   variant: z.string().max(200).optional(),
   privacy: z.literal(true),
+}).superRefine((data, ctx) => {
+  if (data.type !== 'product' && data.description.length < 10) {
+    ctx.addIssue({ code: 'custom', path: ['description'], message: 'Opis musi mieć przynajmniej 10 znaków.' })
+  }
 })
 export function validateInquiry(input:unknown,files:FileMeta[]=[]){
   return inquirySchema.superRefine((data,ctx)=>{

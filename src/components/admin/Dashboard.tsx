@@ -65,6 +65,11 @@ export function Dashboard({ payload, user }: ServerProps) {
       <nav className="sp-shortcuts" aria-label="Dodawanie treści">
         {shortcuts.map(([label, slug]) => <Link key={slug} href={`/admin/collections/${slug}/create`} prefetch={false}><FilePlus2 size={19} aria-hidden="true" /> {label}</Link>)}
       </nav>
+      <nav className="sp-list-views" aria-label="Zadania właściciela">
+        <Link href={`${inbox}?where[status][equals]=new`} prefetch={false}>Oceń nowe zapytania</Link>
+        <Link href={`${inbox}?where[status][equals]=review`} prefetch={false}>Sprawy w ocenie</Link>
+        <Link href="/admin/collections/outbox?where[state][equals]=failed" prefetch={false}>Sprawdź błędy poczty</Link>
+      </nav>
       <div className="sp-admin-grid">
         <section className="sp-admin-card sp-workspace-panel">
           <h2><Clock3 size={19} aria-hidden="true" /> Do załatwienia</h2>
