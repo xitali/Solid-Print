@@ -1180,7 +1180,7 @@ p { color: var(--muted); }
 /* Realizacje (/realizacje) */
 .realization-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr));
   gap: var(--s-6);
 }
 .realization-card {
@@ -1199,13 +1199,23 @@ p { color: var(--muted); }
   border-color: var(--charcoal);
   box-shadow: 0 8px 24px rgba(28, 27, 25, 0.08);
 }
-.realization-card img {
+.realization-image {
+  display: grid;
+  place-items: center;
+  overflow: hidden;
   width: 100%;
   aspect-ratio: 16/10;
-  object-fit: cover;
   border-radius: var(--radius-btn);
   margin-bottom: var(--s-4);
   background: var(--tone-eceae1);
+  color: var(--ink-soft);
+}
+.realization-image img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  object-fit: contain;
 }
 .realization-card .mono {
   font-size: 11px;

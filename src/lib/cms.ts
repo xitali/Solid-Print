@@ -1,9 +1,23 @@
-import { getPayload } from 'payload'
+import { getPayload, type Where } from 'payload'
 import config from '@payload-config'
 import { cache } from 'react'
 import type { Website } from './types'
 
 export const cms = cache(async () => getPayload({config}))
+export async function homeItems<T>(collection: 'products' | 'projects' | 'articles' | 'faqs', limit: number, filter: Where = {}): Promise<T[]> {
+  if (!process.env.DATABASE_URL && process.env.PLATFORM !== 'cloudflare') return []
+  const p = await cms()
+  const { docs } = await p.find({
+    collection,
+    where: { and: [{ published: { equals: true } }, filter] },
+    limit,
+    depth: 1,
+    pagination: false,
+    overrideAccess: false,
+    sort: collection === 'faqs' ? ['order', 'id'] : ['-createdAt', '-id'],
+  })
+  return docs as T[]
+}
 export async function list<T>(collection:string, limit=100):Promise<T[]> {
   if (!process.env.DATABASE_URL && process.env.PLATFORM!=='cloudflare') return []
   const p = await cms()

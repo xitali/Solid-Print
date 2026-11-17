@@ -14,18 +14,18 @@ import {
 } from '@/components/Icons'
 import { ContactForm } from '@/components/ContactForm'
 import { StructuredData } from '@/components/StructuredData'
-import { list, website } from '@/lib/cms'
+import { RealizationCard } from '@/components/RealizationCard'
+import { homeItems, website } from '@/lib/cms'
 import type { Product, Project, FAQ, Article } from '@/lib/types'
 
 export default async function Home() {
-  const [s, products, projects, faqs, articles] = await Promise.all([
+  const [s, selected, projects, faqs, articles] = await Promise.all([
     website(),
-    list<Product>('products'),
-    list<Project>('projects'),
-    list<FAQ>('faqs'),
-    list<Article>('articles'),
+    homeItems<Product>('products', 6, { featured: { equals: true } }),
+    homeItems<Project>('projects', 3),
+    homeItems<FAQ>('faqs', 5),
+    homeItems<Article>('articles', 3),
   ])
-  const selected = products.filter((p) => p.featured).slice(0, 6)
 
 
   return (
@@ -135,17 +135,7 @@ export default async function Home() {
               </Link>
             </div>
             <div className="realization-grid">
-              {projects.slice(0, 3).map((p) => (
-                <Link href={`/realizacje/${p.slug}`} className="realization-card" key={p.id}>
-                  {p.image?.url && <img src={p.image.url} alt={p.image.alt || p.title} />}
-                  <span className="mono muted">
-                    {p.material} {p.dimensions && `/ ${p.dimensions}`}
-                  </span>
-                  <h3>{p.title}</h3>
-                  <p>{p.result}</p>
-                  <ArrowUpRight size={20} />
-                </Link>
-              ))}
+              {projects.map((project) => <RealizationCard key={project.id} project={project} />)}
             </div>
           </div>
         </section>
@@ -270,7 +260,7 @@ export default async function Home() {
               </Link>
             </div>
             <div className="article-grid">
-              {articles.slice(0, 3).map((a) => (
+              {articles.map((a) => (
                 <Link href={`/poradnik/${a.slug}`} className="article-card" key={a.id}>
                   <h3>{a.title}</h3>
                   <p>{a.description}</p>
@@ -314,7 +304,7 @@ export default async function Home() {
                 </a>
               )}
             </div>
-            {faqs.length > 0 && <FAQList items={faqs.slice(0, 5)} />}
+            {faqs.length > 0 && <FAQList items={faqs} />}
           </div>
           <div className="contact-form-card" style={{ background: '#FFFFFF', color: 'var(--ink)' }}>
             <span className="mono muted">ZACZNIJMY OD WIADOMOŚCI</span>

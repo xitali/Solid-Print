@@ -1,8 +1,7 @@
 import { EmptyState,PageIntro } from '@/components/UI'
+import { RealizationCard } from '@/components/RealizationCard'
 import { list } from '@/lib/cms'
 import type { Project } from '@/lib/types'
-import { ArrowUpRight } from 'lucide-react'
-import Link from 'next/link'
 type SectionProps = {section:string;query:Record<string,string|undefined>;settings:import("@/lib/types").Website;title:string}
 export default async function Projects(_props:SectionProps){
 
@@ -17,17 +16,7 @@ export default async function Projects(_props:SectionProps){
         <div className="container page-content">
           {projects.length ? (
             <div className="realization-grid">
-              {projects.map((p) => (
-                <Link className="realization-card" key={p.id} href={`/realizacje/${p.slug}`}>
-                  {p.image?.url && <img src={p.image.url} alt={p.image.alt || p.title} />}
-                  <span className="mono muted">
-                    {p.material} {p.dimensions && `/ ${p.dimensions}`}
-                  </span>
-                  <h3>{p.title}</h3>
-                  <p>{p.result}</p>
-                  <ArrowUpRight size={20} />
-                </Link>
-              ))}
+              {projects.map((project) => <RealizationCard key={project.id} project={project} />)}
             </div>
           ) : (
             <EmptyState
