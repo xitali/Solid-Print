@@ -4,11 +4,11 @@ export function Logo() {
   return (
     <div
       style={{
-        fontFamily: 'sans-serif',
+        fontFamily: 'inherit',
         fontSize: 28,
         fontWeight: 700,
         letterSpacing: -1,
-        color: '#17191A',
+        color: 'var(--sp-text, #17191A)',
         display: 'flex',
         alignItems: 'center',
         gap: 12,

@@ -3,6 +3,7 @@ import { Suspense } from 'react'
 import type { ServerProps, Where } from 'payload'
 import { ArrowUpRight, Clock3, FilePlus2, Inbox } from 'lucide-react'
 import { StatusCell } from './StatusCell'
+import { Gutter } from '@payloadcms/ui'
 
 const inbox = '/admin/collections/inquiries'
 const shortcuts = [
@@ -52,6 +53,7 @@ export function Dashboard({ payload, user }: ServerProps) {
   const overdueLink = `${inbox}?where[status][equals]=new&where[createdAt][less_than]=${encodeURIComponent(cutoff)}&sort=createdAt`
 
   return (
+    <Gutter className="sp-dashboard">
     <section className="sp-workspace" aria-label="Panel pracowni">
       <header className="sp-workspace-header">
         <div><h1>Panel pracowni</h1><p>{user.name ? `Dzień dobry, ${user.name}.` : 'Zarządzaj zapytaniami i ofertą Solid Print.'}</p></div>
@@ -80,5 +82,6 @@ export function Dashboard({ payload, user }: ServerProps) {
         </section>
       </div>
     </section>
+    </Gutter>
   )
 }
