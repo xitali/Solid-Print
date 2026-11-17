@@ -370,6 +370,10 @@ export interface Project {
   solution: string;
   result: string;
   image?: (number | null) | Media;
+  /**
+   * Miniatura powstaje po zmianie zdjęcia. Możesz też przygotować ją dla istniejącej realizacji.
+   */
+  cardImage?: (number | null) | Media;
   material?: string | null;
   dimensions?: string | null;
   published?: boolean | null;
@@ -776,6 +780,7 @@ export interface ProjectsSelect<T extends boolean = true> {
   solution?: T;
   result?: T;
   image?: T;
+  cardImage?: T;
   material?: T;
   dimensions?: T;
   published?: T;

@@ -2,6 +2,13 @@ import path from 'node:path'
 import type { CollectionConfig, Field } from 'payload'
 import { owner,published } from '../access'
 import { applicationsField,content,descriptionField,imageField,publicationField } from '../fields'
+import { mediaId } from '../lib/media-reference'
+
+const previewField = (kind: 'material' | 'service' | 'project'): Field => ({
+  name: 'cardPreview',
+  type: 'ui',
+  admin: { components: { Field: { path: '/components/admin/CatalogPreview#CatalogPreview', clientProps: { kind } } } },
+})
 
 const displayOrderField: Field = {
   name: 'displayOrder',
@@ -43,27 +50,34 @@ content(
       'Materiały',
       [
         descriptionField,
+        previewField('material'),
         { name: 'limitations', label: 'Ograniczenia', type: 'textarea' },
         applicationsField,
-        { name: 'colors', label: 'Dostępne kolory', type: 'text' },
         {
-          name: 'colorSamples',
-          label: 'Próbki kolorów',
-          labels: { singular: 'Próbka koloru', plural: 'Próbki kolorów' },
-          type: 'array',
+          type: 'collapsible',
+          label: 'Kolory i próbki',
           fields: [
-            { name: 'name', label: 'Nazwa koloru', type: 'text', required: true },
+            { name: 'colors', label: 'Dostępne kolory', type: 'text' },
             {
-              name: 'hex',
-              label: 'Kod koloru HEX',
-              type: 'text',
-              admin: { placeholder: '#E06A38' },
-              validate: (value: string | null | undefined) =>
-                !value || /^#[0-9a-f]{6}$/i.test(value) ? true : 'Podaj kod w formacie #RRGGBB.',
+              name: 'colorSamples',
+              label: 'Próbki kolorów',
+              labels: { singular: 'Próbka koloru', plural: 'Próbki kolorów' },
+              type: 'array',
+              fields: [
+                { name: 'name', label: 'Nazwa koloru', type: 'text', required: true },
+                {
+                  name: 'hex',
+                  label: 'Kod koloru HEX',
+                  type: 'text',
+                  admin: { placeholder: '#E06A38', components: { Field: '/components/admin/ColorField#ColorField' } },
+                  validate: (value: string | null | undefined) =>
+                    !value || /^#[0-9a-f]{6}$/i.test(value) ? true : 'Podaj kod w formacie #RRGGBB.',
+                },
+                imageField,
+              ],
+              admin: { description: 'Podaj kod koloru lub dodaj zdjęcie próbki. Jeśli dodasz oba, pokażemy zdjęcie.' },
             },
-            imageField,
           ],
-          admin: { description: 'Podaj kod koloru lub dodaj zdjęcie próbki. Jeśli dodasz oba, pokażemy zdjęcie.' },
         },
         {
           type: 'collapsible',
@@ -95,6 +109,7 @@ content(
       'Usługi',
       [
         descriptionField,
+        previewField('service'),
         { name: 'body', label: 'Szczegóły (akapity oddziel pustą linią)', type: 'textarea' },
         { name: 'applications', label: 'Zastosowania', type: 'textarea' },
         {
@@ -115,26 +130,55 @@ content(
             { label: 'Projektowanie', value: 'design' },
           ],
         },
-        { name: 'requirements', label: 'Wymagania', type: 'textarea' },
-        { name: 'additionalInfo', label: 'Dodatkowe informacje', type: 'textarea' },
+        {
+          label: 'Informacje dla zamawiającego',
+          type: 'collapsible',
+          fields: [
+            { name: 'requirements', label: 'Wymagania', type: 'textarea' },
+            { name: 'additionalInfo', label: 'Dodatkowe informacje', type: 'textarea' },
+          ],
+        },
         displayOrderField,
       ],
       'Oferta'
     ),
-content(
+{
+  ...content(
       'projects',
       'Realizacja',
       'Realizacje',
       [
+        previewField('project'),
         { name: 'problem', label: 'Problem', type: 'textarea', required: true },
         { name: 'solution', label: 'Projekt / rozwiązanie', type: 'textarea', required: true },
         { name: 'result', label: 'Efekt', type: 'textarea', required: true },
         imageField,
+        {
+          ...imageField,
+          name: 'cardImage',
+          label: 'Miniatura karty',
+          admin: {
+            description: 'Miniatura powstaje po zmianie zdjęcia. Możesz też przygotować ją dla istniejącej realizacji.',
+            components: { Field: '/components/admin/ProjectThumbnail#ProjectThumbnail' },
+          },
+        },
         { name: 'material', label: 'Materiał', type: 'text' },
         { name: 'dimensions', label: 'Wymiary', type: 'text' },
       ],
       'Treści'
-    ),
+  ),
+  hooks: {
+    beforeChange: [({ data, originalDoc }) => {
+      if (!('image' in data)) return data
+      const image = mediaId(data.image)
+      const oldThumbnail = mediaId(originalDoc?.cardImage)
+      if (!image || (image !== mediaId(originalDoc?.image) && (!('cardImage' in data) || mediaId(data.cardImage) === oldThumbnail))) {
+        data.cardImage = null
+      }
+      return data
+    }],
+  },
+},
 content(
       'articles',
       'Artykuł',

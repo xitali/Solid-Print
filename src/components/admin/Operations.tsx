@@ -1,4 +1,28 @@
 import { cloudUsage, usageLevel } from '@/lib/usage'
+import { DefaultTemplate } from '@payloadcms/next/templates'
+import Link from 'next/link'
+import { Suspense } from 'react'
+import type { AdminViewServerProps } from 'payload'
+
+export function OperationsView(props: AdminViewServerProps) {
+  const { req, visibleEntities } = props.initPageResult
+  if (req.user?.role !== 'owner') return null
+
+  return (
+    <DefaultTemplate {...props} req={req} visibleEntities={visibleEntities}>
+      <section className="sp-workspace sp-system-view">
+        <Link href="/admin" prefetch={false}>← Panel pracowni</Link>
+        <h1>Stan systemu</h1>
+        <div className="sp-shortcuts">
+          <Link href="/admin/collections/quote-files?where[status][equals]=quarantined" prefetch={false}>Pliki w kwarantannie</Link>
+          <Link href="/admin/collections/outbox?where[state][equals]=failed" prefetch={false}>Błędy poczty</Link>
+          <Link href="/admin/collections/outbox?where[state][equals]=pending" prefetch={false}>Poczta oczekująca</Link>
+        </div>
+        <Suspense fallback={<p role="status">Wczytywanie stanu usług…</p>}><Operations /></Suspense>
+      </section>
+    </DefaultTemplate>
+  )
+}
 
 export async function Operations() {
   if(process.env.PLATFORM!=='cloudflare')return <p className="sp-admin-notice">Środowisko lokalne — wskaźniki produkcji Cloudflare są dostępne w panelu wdrożonej strony.</p>

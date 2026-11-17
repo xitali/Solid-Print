@@ -56,6 +56,12 @@ export const Inquiries: CollectionConfig = {
       },
     },
 
+    {
+      name: 'workflow',
+      type: 'ui',
+      admin: { components: { Field: '/components/admin/InquiryWorkflow#InquiryWorkflow' } },
+    },
+
     // --- Kolumna boczna (Item A2) ---
     {
       name: 'status',

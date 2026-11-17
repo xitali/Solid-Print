@@ -26,6 +26,9 @@ admin: {
       },
       beforeLogin: ['/components/admin/Welcome#Welcome'],
       beforeDashboard: ['/components/admin/Dashboard#Dashboard'],
+      views: {
+        operations: { path: '/stan-systemu', Component: '/components/admin/Operations#OperationsView' },
+      },
     },
   },
 typescript: { outputFile: path.resolve(dirname, 'payload-types.ts') },
