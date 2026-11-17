@@ -1,4 +1,5 @@
 import { EmptyState,PageIntro } from '@/components/UI'
+import { MaterialOptions } from '@/components/MaterialOptions'
 import { list } from '@/lib/cms'
 import type { Material } from '@/lib/types'
 import { ArrowUpRight } from 'lucide-react'
@@ -57,23 +58,18 @@ export default async function Materials({query}:SectionProps){
                   <p>{m.description}</p>
                   <dl>
                     {m.applications?.length ? (
-                      <>
+                      <div>
                         <dt>Zastosowania</dt>
                         <dd>{m.applications.map((a) => a.value).join(', ')}</dd>
-                      </>
+                      </div>
                     ) : null}
                     {m.limitations && (
-                      <>
+                      <div>
                         <dt>Ograniczenia</dt>
                         <dd>{m.limitations}</dd>
-                      </>
+                      </div>
                     )}
-                    {m.colors && (
-                      <>
-                        <dt>Kolory</dt>
-                        <dd>{m.colors}</dd>
-                      </>
-                    )}
+                    <MaterialOptions material={m} />
                   </dl>
                   <Link href="/wycena" className="text-link">
                     Zapytaj o wykonanie <ArrowUpRight size={16} />

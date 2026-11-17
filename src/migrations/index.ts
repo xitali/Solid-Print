@@ -1,6 +1,7 @@
 import * as migration_20261031_215421_initial from './20261031_215421_initial';
 import * as migration_20261031_220723_upload_integrity_and_related_projects from './20261031_220723_upload_integrity_and_related_projects';
 import * as inquiry_history from './20261101_203900_inquiry_history';
+import * as catalog_options from './20261117_201400_catalog_options';
 
 export const migrations = [
   {
@@ -14,4 +15,5 @@ export const migrations = [
     name: '20261031_220723_upload_integrity_and_related_projects'
   },
   {up:inquiry_history.up,down:inquiry_history.down,name:'20261101_203900_inquiry_history'},
+  {up:catalog_options.up,down:catalog_options.down,name:'20261117_201400_catalog_options'},
 ];

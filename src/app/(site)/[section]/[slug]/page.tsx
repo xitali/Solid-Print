@@ -6,6 +6,8 @@ import { ProductDetails } from '@/components/ProductDetails'
 import { PageIntro, Paragraphs } from '@/components/UI'
 import { SectionLabel } from '@/components/Brand'
 import { StructuredData } from '@/components/StructuredData'
+import { MaterialOptions } from '@/components/MaterialOptions'
+import { ServiceExtraDetails } from '@/components/ServiceExtraDetails'
 import type { Product, Project, Article, Service, Material } from '@/lib/types'
 
 type Args = { params: Promise<{ section: string; slug: string }> }
@@ -114,6 +116,14 @@ export default async function Page({ params }: Args) {
               ))}
             </div>
           ) : null}
+
+          {section === 'materialy' && (d.colors || d.colorSamples?.length || d.glassFiber || d.carbonFiber) ? (
+            <dl className="material-options">
+              <MaterialOptions material={d} />
+            </dl>
+          ) : null}
+
+          {section === 'uslugi' && <ServiceExtraDetails service={d} detailPage />}
 
           <div style={{ marginTop: 'var(--s-7)' }}>
             <Link href={`/wycena?type=${d.kind || 'design'}`} className="btn btn--primary">

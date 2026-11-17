@@ -7,8 +7,14 @@ export const cms = cache(async () => getPayload({config}))
 export async function list<T>(collection:string, limit=100):Promise<T[]> {
   if (!process.env.DATABASE_URL && process.env.PLATFORM!=='cloudflare') return []
   const p = await cms()
+  const manuallyOrdered = collection === 'materials' || collection === 'services'
   const docs:T[]=[];let page=1
-  while(true){const result=await p.find({collection:collection as never,where:{published:{equals:true}},limit,page,depth:2,overrideAccess:false,sort:collection==='faqs'?'order':'-createdAt'});docs.push(...result.docs as T[]);if(!result.hasNextPage)break;page++}
+  const sort = manuallyOrdered ? ['-createdAt', '-id'] : collection === 'faqs' ? 'order' : '-createdAt'
+  while(true){const result=await p.find({collection:collection as never,where:{published:{equals:true}},limit,page,depth:2,overrideAccess:false,sort});docs.push(...result.docs as T[]);if(!result.hasNextPage)break;page++}
+  if (manuallyOrdered) {
+    const order = (doc: T) => (doc as { displayOrder?: number | null }).displayOrder ?? Number.MAX_SAFE_INTEGER
+    docs.sort((a, b) => order(a) - order(b))
+  }
   return docs
 }
 export const website = cache(async ():Promise<Website> => {

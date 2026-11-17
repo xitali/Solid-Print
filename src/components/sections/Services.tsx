@@ -1,4 +1,5 @@
 import { PageIntro,Process } from '@/components/UI'
+import { ServiceExtraDetails } from '@/components/ServiceExtraDetails'
 import { list } from '@/lib/cms'
 import type { Service } from '@/lib/types'
 import { ArrowUpRight,Boxes,FileBox,Layers,PenTool } from 'lucide-react'
@@ -67,6 +68,7 @@ export default async function Services({section}:SectionProps){
                       {v.applications}
                     </div>
                   )}
+                  <ServiceExtraDetails service={v} />
                   <Link className="text-link" href={`/wycena?type=${v.kind}`}>
                     Porozmawiajmy o projekcie <ArrowUpRight size={17} />
                   </Link>

@@ -1057,12 +1057,20 @@ p { color: var(--muted); }
   color: var(--ink);
   margin-bottom: var(--s-4);
 }
-.service-details strong {
+.service-details strong,
+.service-details .service-details-heading {
   font-size: 11px;
   font-family: var(--font-mono);
   text-transform: uppercase;
   letter-spacing: 0.08em;
   color: var(--ink-soft);
+}
+.service-details .service-details-heading {
+  margin: 0 0 var(--s-2);
+}
+.service-details-text {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
 }
 .service-card > svg {
   position: absolute;
@@ -1080,7 +1088,7 @@ p { color: var(--muted); }
 /* Materiały (/materialy) */
 .material-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr));
   gap: var(--s-6);
 }
 .material-card {
@@ -1115,7 +1123,8 @@ p { color: var(--muted); }
   color: var(--ink-soft);
   margin-bottom: var(--s-5);
 }
-.material-card dl {
+.material-card dl,
+.material-options {
   margin: 0 0 var(--s-5);
   display: flex;
   flex-direction: column;
@@ -1123,13 +1132,15 @@ p { color: var(--muted); }
   border-top: 1px solid var(--line);
   padding-top: var(--s-4);
 }
-.material-card dt {
+.material-card dt,
+.material-options dt {
   font: 600 11px var(--font-mono);
   letter-spacing: 0.08em;
   color: var(--ink-soft);
   text-transform: uppercase;
 }
-.material-card dd {
+.material-card dd,
+.material-options dd {
   margin: 2px 0 0;
   font-size: 13.5px;
   color: var(--ink);
@@ -1138,6 +1149,32 @@ p { color: var(--muted); }
 .material-card .text-link {
   margin-top: auto;
   align-self: flex-start;
+}
+.material-card .material-samples,
+.material-options .material-samples {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-2);
+  list-style: none;
+  padding: 0;
+  margin: var(--s-2) 0 0;
+}
+.material-samples li {
+  display: flex;
+  align-items: center;
+  gap: var(--s-2);
+  max-width: 100%;
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+.material-sample {
+  display: block;
+  flex: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 1px solid var(--line);
+  object-fit: cover;
 }
 
 /* Realizacje (/realizacje) */
@@ -1471,6 +1508,9 @@ p { color: var(--muted); }
 }
 .prose li {
   margin-bottom: var(--s-2);
+}
+.prose .material-samples li {
+  margin-bottom: 0;
 }
 .prose .button,
 .prose .btn {

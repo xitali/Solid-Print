@@ -1,7 +1,24 @@
 import path from 'node:path'
-import type { CollectionConfig } from 'payload'
+import type { CollectionConfig, Field } from 'payload'
 import { owner,published } from '../access'
 import { applicationsField,content,descriptionField,imageField,publicationField } from '../fields'
+
+const displayOrderField: Field = {
+  name: 'displayOrder',
+  label: 'Kolejność na stronie',
+  type: 'number',
+  min: 1,
+  max: 2147483647,
+  validate: (value: number | null | undefined) =>
+    value == null || (Number.isInteger(value) && value >= 1 && value <= 2147483647)
+      ? true
+      : 'Podaj dodatnią liczbę całkowitą do 2147483647.',
+  admin: {
+    position: 'sidebar',
+    description: '1 jest pierwsze. Pozycje bez numeru wyświetlają się na końcu.',
+  },
+}
+
 export function catalogCollections(cloud:boolean):CollectionConfig[]{return [{
       slug: 'media',
       labels: { singular: 'Zdjęcie', plural: 'Zdjęcia' },
@@ -30,6 +47,33 @@ content(
         applicationsField,
         { name: 'colors', label: 'Dostępne kolory', type: 'text' },
         {
+          name: 'colorSamples',
+          label: 'Próbki kolorów',
+          labels: { singular: 'Próbka koloru', plural: 'Próbki kolorów' },
+          type: 'array',
+          fields: [
+            { name: 'name', label: 'Nazwa koloru', type: 'text', required: true },
+            {
+              name: 'hex',
+              label: 'Kod koloru HEX',
+              type: 'text',
+              admin: { placeholder: '#E06A38' },
+              validate: (value: string | null | undefined) =>
+                !value || /^#[0-9a-f]{6}$/i.test(value) ? true : 'Podaj kod w formacie #RRGGBB.',
+            },
+            imageField,
+          ],
+          admin: { description: 'Podaj kod koloru lub dodaj zdjęcie próbki. Jeśli dodasz oba, pokażemy zdjęcie.' },
+        },
+        {
+          type: 'collapsible',
+          label: 'Warianty wzmacniane włóknem',
+          fields: [
+            { name: 'glassFiber', label: 'Włókno szklane (GF)', type: 'checkbox' },
+            { name: 'carbonFiber', label: 'Włókno węglowe (CF)', type: 'checkbox' },
+          ],
+        },
+        {
           name: 'group',
           label: 'Grupa',
           type: 'select',
@@ -41,6 +85,7 @@ content(
           ],
         },
         { name: 'available', label: 'Dostępny', type: 'checkbox', defaultValue: true },
+        displayOrderField,
       ],
       'Oferta'
     ),
@@ -70,6 +115,9 @@ content(
             { label: 'Projektowanie', value: 'design' },
           ],
         },
+        { name: 'requirements', label: 'Wymagania', type: 'textarea' },
+        { name: 'additionalInfo', label: 'Dodatkowe informacje', type: 'textarea' },
+        displayOrderField,
       ],
       'Oferta'
     ),

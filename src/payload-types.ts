@@ -306,8 +306,25 @@ export interface Material {
       }[]
     | null;
   colors?: string | null;
+  /**
+   * Podaj kod koloru lub dodaj zdjęcie próbki. Jeśli dodasz oba, pokażemy zdjęcie.
+   */
+  colorSamples?:
+    | {
+        name: string;
+        hex?: string | null;
+        image?: (number | null) | Media;
+        id?: string | null;
+      }[]
+    | null;
+  glassFiber?: boolean | null;
+  carbonFiber?: boolean | null;
   group?: ('decorative' | 'technical' | 'flexible' | 'outdoor') | null;
   available?: boolean | null;
+  /**
+   * 1 jest pierwsze. Pozycje bez numeru wyświetlają się na końcu.
+   */
+  displayOrder?: number | null;
   published?: boolean | null;
   updatedAt: string;
   createdAt: string;
@@ -328,6 +345,12 @@ export interface Service {
   applications?: string | null;
   relatedProjects?: (number | Project)[] | null;
   kind: 'print' | 'design';
+  requirements?: string | null;
+  additionalInfo?: string | null;
+  /**
+   * 1 jest pierwsze. Pozycje bez numeru wyświetlają się na końcu.
+   */
+  displayOrder?: number | null;
   published?: boolean | null;
   updatedAt: string;
   createdAt: string;
@@ -706,8 +729,19 @@ export interface MaterialsSelect<T extends boolean = true> {
         id?: T;
       };
   colors?: T;
+  colorSamples?:
+    | T
+    | {
+        name?: T;
+        hex?: T;
+        image?: T;
+        id?: T;
+      };
+  glassFiber?: T;
+  carbonFiber?: T;
   group?: T;
   available?: T;
+  displayOrder?: T;
   published?: T;
   updatedAt?: T;
   createdAt?: T;
@@ -724,6 +758,9 @@ export interface ServicesSelect<T extends boolean = true> {
   applications?: T;
   relatedProjects?: T;
   kind?: T;
+  requirements?: T;
+  additionalInfo?: T;
+  displayOrder?: T;
   published?: T;
   updatedAt?: T;
   createdAt?: T;
