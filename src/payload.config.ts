@@ -1,7 +1,7 @@
 import { pl } from '@payloadcms/translations/languages/pl'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { buildConfig, type CollectionConfig } from 'payload'
+import { buildConfig, type CollectionConfig, type Field } from 'payload'
 import { catalogCollections } from './collections/catalog'
 import { Inquiries } from './collections/inquiries'
 import { Products } from './collections/products'
@@ -15,7 +15,8 @@ const collections: CollectionConfig[] = [Inquiries, ...systemCollections.filter(
 const listColumns: Record<string, string[]> = {
   materials: ['title', 'published', 'displayOrder', 'sampleCount', 'updatedAt'],
   services: ['title', 'published', 'displayOrder', 'requirementsState', 'updatedAt'],
-  media: ['preview', 'filename', 'alt', 'updatedAt'],
+  products: [...(Products.admin?.defaultColumns ?? []), 'recordActions'],
+  media: ['preview', 'filename', 'alt', 'updatedAt', 'recordActions'],
   projects: ['title', 'published', 'image', 'cardImage', 'updatedAt'],
   faqs: ['question', 'published', 'order', 'updatedAt'],
 }
@@ -23,6 +24,12 @@ const summaryFields: Record<string, { name: string; label: string; component: st
   materials: { name: 'sampleCount', label: 'Próbki', component: 'MaterialSampleCount' },
   services: { name: 'requirementsState', label: 'Wymagania', component: 'ServiceRequirementsCell' },
   media: { name: 'preview', label: 'Miniatura', component: 'MediaPreviewCell' },
+}
+const recordActions: Field = {
+  name: 'recordActions',
+  label: 'Akcje',
+  type: 'ui',
+  admin: { components: { Cell: '/components/admin/RecordActions#RecordActions' } },
 }
 export default buildConfig({
 ...await platformConfig(),
@@ -52,10 +59,15 @@ typescript: { outputFile: path.resolve(dirname, 'payload-types.ts') },
 globals: [Website],
 collections: collections.map(collection => {
   const summary = summaryFields[collection.slug]
+  const fields = [...collection.fields]
+  if (summary) {
+    fields.push({ name: summary.name, label: summary.label, type: 'ui',
+      admin: { components: { Cell: `/components/admin/CatalogCells#${summary.component}` } } })
+  }
+  if (collection.slug === 'products' || collection.slug === 'media') fields.push(recordActions)
   return {
     ...collection,
-    fields: summary ? [...collection.fields, { name: summary.name, label: summary.label, type: 'ui',
-      admin: { components: { Cell: `/components/admin/CatalogCells#${summary.component}` } } }] : collection.fields,
+    fields,
     admin: {
       ...collection.admin,
       defaultColumns: listColumns[collection.slug] ?? collection.admin?.defaultColumns,

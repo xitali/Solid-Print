@@ -14,6 +14,7 @@ import { Download as Download_2d30c99c2ef8d5263b45469e5da4acfd } from '../../../
 import { ProductThumbnail as ProductThumbnail_aeaa5c010f18ba71f35c7b6f93d4de85 } from '../../../components/admin/ProductThumbnail'
 import { SlugField as SlugField_d66ddfc75b0270bf9636e30c2125444d } from '../../../components/admin/SlugField'
 import { PublicationCell as PublicationCell_a8d82b1f633498a7424b8f4f116b938d } from '../../../components/admin/CatalogCells'
+import { RecordActions as RecordActions_94bb404426ea55e56f829e0f8e1a04e0 } from '../../../components/admin/RecordActions'
 import { MediaPreviewCell as MediaPreviewCell_a8d82b1f633498a7424b8f4f116b938d } from '../../../components/admin/CatalogCells'
 import { CatalogPreview as CatalogPreview_b0e9c3c92c7e98aee2a3709ba62c146d } from '../../../components/admin/CatalogPreview'
 import { ColorField as ColorField_f18d715b9f5ea63091d1361f9c46fa22 } from '../../../components/admin/ColorField'
@@ -48,6 +49,7 @@ export const importMap = {
   "/components/admin/ProductThumbnail#ProductThumbnail": ProductThumbnail_aeaa5c010f18ba71f35c7b6f93d4de85,
   "/components/admin/SlugField#SlugField": SlugField_d66ddfc75b0270bf9636e30c2125444d,
   "/components/admin/CatalogCells#PublicationCell": PublicationCell_a8d82b1f633498a7424b8f4f116b938d,
+  "/components/admin/RecordActions#RecordActions": RecordActions_94bb404426ea55e56f829e0f8e1a04e0,
   "/components/admin/CatalogCells#MediaPreviewCell": MediaPreviewCell_a8d82b1f633498a7424b8f4f116b938d,
   "/components/admin/CatalogPreview#CatalogPreview": CatalogPreview_b0e9c3c92c7e98aee2a3709ba62c146d,
   "/components/admin/ColorField#ColorField": ColorField_f18d715b9f5ea63091d1361f9c46fa22,

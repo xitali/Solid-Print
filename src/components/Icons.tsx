@@ -5,6 +5,27 @@ type IconProps = {
   className?: string
 }
 
+export function EditRecordIcon({ size = 48, className }: IconProps) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 48 48" fill="none" className={className} aria-hidden="true"
+      stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M23 9H11a3 3 0 0 0-3 3v25a3 3 0 0 0 3 3h25a3 3 0 0 0 3-3V25" />
+      <path d="m20 29 2-7L35 9a3 3 0 0 1 4 0l2 2a3 3 0 0 1 0 4L28 28l-8 1Z" />
+      <path d="m32 12 6 6" stroke="var(--sp-accent, currentColor)" />
+    </svg>
+  )
+}
+
+export function DeleteRecordIcon({ size = 48, className }: IconProps) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 48 48" fill="none" className={className} aria-hidden="true"
+      stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M8 13h32M18 13V8h12v5M12 13l2 23a4 4 0 0 0 4 4h12a4 4 0 0 0 4-4l2-23" />
+      <path d="M20 21v11m8-11v11" stroke="var(--sp-accent, currentColor)" />
+    </svg>
+  )
+}
+
 /*
  * Zestaw autorskich ikon Solid Print według specyfikacji PDF (Plansza 02 — IKONY):
  * - Siatka 48 px, kreska 2 px, końce i naroża zaokrąglone.

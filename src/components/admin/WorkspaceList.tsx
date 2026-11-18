@@ -1,7 +1,8 @@
 'use client'
 
 import Link from 'next/link'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { useListQuery } from '@payloadcms/ui'
 import { usePathname, useSearchParams } from 'next/navigation'
 import { BookOpen, Box, CircleHelp, FileStack, Images, Inbox, Layers3, Mail, Shapes, Users, Wrench } from 'lucide-react'
 import type { BeforeListTableClientProps } from 'payload'
@@ -26,8 +27,18 @@ export function WorkspaceList({ collectionSlug }: BeforeListTableClientProps) {
   const params = useSearchParams()
   const [fullTable, setFullTable] = useState(false)
   const [gallery, setGallery] = useState(false)
+  const { query, refineListData } = useListQuery()
   const base = `/admin/collections/${collectionSlug}`
   const list = lists[collectionSlug as keyof typeof lists]
+  const columns = query?.columns
+
+  useEffect(() => {
+    if (pathname !== base || (collectionSlug !== 'products' && collectionSlug !== 'media')) return
+    if (Array.isArray(columns) && columns.length && !columns.includes('recordActions') && !columns.includes('-recordActions')) {
+      void refineListData({ columns: [...columns, 'recordActions'] }, false)
+    }
+  }, [base, collectionSlug, columns, pathname, refineListData])
+
   if (!list || pathname !== base) return null
 
   const { Icon, filters } = list

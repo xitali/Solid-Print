@@ -1,11 +1,9 @@
 'use client'
 import { useEffect, useState } from 'react'
-import { RecordEditLink } from './RecordEditLink'
 
 type Image = { id?: number; url?: string; alt?: string }
-export function ProductThumbnail({ rowData, viewType }: {
-  rowData?: { id?: number | string; title?: string; images?: { image?: number | Image }[] }
-  viewType?: string
+export function ProductThumbnail({ rowData }: {
+  rowData?: { title?: string; images?: { image?: number | Image }[] }
 }) {
   const image=rowData?.images?.[0]?.image
   const id=typeof image==='number'?image:image?.id
@@ -22,12 +20,7 @@ export function ProductThumbnail({ rowData, viewType }: {
   }, [id, embedded?.url])
   const photo = embedded?.url ? embedded : loaded && loaded.id === id ? loaded.image : null
 
-  return (
-    <div className="sp-record-preview">
-      {photo?.url
-        ? <img className="sp-media-tile" src={photo.url} alt={photo.alt || rowData?.title || ''} width={64} height={48} loading="lazy" decoding="async" />
-        : <span>Brak zdjęcia</span>}
-      <RecordEditLink collection="products" id={rowData?.id} name={rowData?.title} viewType={viewType} />
-    </div>
-  )
+  return photo?.url
+    ? <img className="sp-media-tile" src={photo.url} alt={photo.alt || rowData?.title || ''} width={64} height={48} loading="lazy" decoding="async" />
+    : <span>Brak zdjęcia</span>
 }
