@@ -104,6 +104,16 @@ html[data-theme='dark'] .sp-state-error { background: #49292e; color: #ffb9ba; }
 .sp-site-readiness ul { list-style: none; padding: 0; margin: 12px 0 0; }
 .sp-site-readiness li { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; border-top: 1px solid var(--sp-line); padding-block: 7px; }
 .sp-media-tile { object-fit: cover; border-radius: 7px; }
+.sp-record-preview { display: grid; justify-items: start; gap: 6px; }
+.collection-list .table .sp-record-edit {
+  display: inline-flex; align-items: center; gap: 6px; min-height: 38px;
+  padding: 4px 9px; border: 1px solid var(--sp-line); border-radius: 8px;
+  background: var(--sp-surface); color: var(--sp-accent); text-decoration: none;
+}
+.collection-list .table .sp-record-edit:hover { border-color: var(--sp-accent); background: var(--sp-accent-bg); }
+@media (pointer: coarse) {
+  .collection-list .table .sp-record-edit { min-height: 44px; }
+}
 .sp-preview-images { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(160px, 100%), 1fr)); gap: 12px; }
 .sp-preview-images figure { margin: 0; }
 .sp-preview-images figcaption { font-weight: 600; margin-bottom: 6px; }
