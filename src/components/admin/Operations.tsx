@@ -1,5 +1,6 @@
 import { cloudUsage, usageLevel } from '@/lib/usage'
 import { DefaultTemplate } from '@payloadcms/next/templates'
+import { Gutter } from '@payloadcms/ui'
 import Link from 'next/link'
 import { Suspense } from 'react'
 import type { AdminViewServerProps } from 'payload'
@@ -12,16 +13,20 @@ export function OperationsView(props: AdminViewServerProps) {
 
   return (
     <DefaultTemplate {...props} req={req} visibleEntities={visibleEntities}>
-      <section className="sp-workspace sp-system-view">
-        <Link href="/admin" prefetch={false}>← Panel pracowni</Link>
-        <h1>Stan systemu</h1>
-        <div className="sp-shortcuts">
-          <Link href="/admin/collections/quote-files?where[status][equals]=quarantined" prefetch={false}>Pliki w kwarantannie</Link>
-          <Link href="/admin/collections/outbox?where[state][equals]=failed" prefetch={false}>Błędy poczty</Link>
-          <Link href="/admin/collections/outbox?where[state][equals]=pending" prefetch={false}>Poczta oczekująca</Link>
-        </div>
-        <Suspense fallback={<p role="status">Wczytywanie stanu usług…</p>}><Operations /></Suspense>
-      </section>
+      <Gutter>
+        <section className="sp-workspace sp-system-view">
+          <header className="sp-system-header">
+            <Link href="/admin" prefetch={false}>← Panel pracowni</Link>
+            <h1>Stan systemu</h1>
+            <nav className="sp-shortcuts" aria-label="Skróty stanu systemu">
+              <Link href="/admin/collections/quote-files?where[status][equals]=quarantined" prefetch={false}>Pliki w kwarantannie</Link>
+              <Link href="/admin/collections/outbox?where[state][equals]=failed" prefetch={false}>Błędy poczty</Link>
+              <Link href="/admin/collections/outbox?where[state][equals]=pending" prefetch={false}>Poczta oczekująca</Link>
+            </nav>
+          </header>
+          <Suspense fallback={<p role="status">Wczytywanie stanu usług…</p>}><Operations /></Suspense>
+        </section>
+      </Gutter>
     </DefaultTemplate>
   )
 }

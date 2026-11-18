@@ -125,7 +125,12 @@ html[data-theme='dark'] .sp-state-error { background: #49292e; color: #ffb9ba; }
 }
 .template-minimal .login { background: var(--sp-surface); border: 1px solid var(--sp-line); border-radius: var(--sp-radius); padding: clamp(18px, 4vw, 36px); box-shadow: var(--sp-shadow); }
 
-.sp-dashboard .sp-workspace { max-width: 1440px; margin-inline: auto; }
+.sp-dashboard .sp-workspace, .sp-system-view { max-width: 1440px; margin-inline: auto; }
+.sp-system-view { padding-block-start: clamp(12px, 2vw, 24px); }
+.sp-system-header { display: grid; justify-items: start; gap: 12px; }
+.sp-system-header :is(h1, .sp-shortcuts) { margin: 0; }
+.sp-system-header > a, .sp-operations > a { color: var(--sp-accent); text-underline-offset: 3px; }
+.sp-operations > a { display: inline-block; margin-block-start: 12px; }
 .sp-workspace-header {
   padding: clamp(20px, 3vw, 36px); border-color: var(--sp-line); border-radius: 18px;
   background: linear-gradient(115deg, var(--sp-accent-bg), var(--sp-surface) 74%); box-shadow: var(--sp-shadow);
