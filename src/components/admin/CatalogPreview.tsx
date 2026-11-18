@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { useFormFields } from '@payloadcms/ui'
 import { mediaId } from '@/lib/media-reference'
+import { inferredColorSamples } from '@/lib/material-colors'
 
 export function CatalogPreview({ kind }: { kind: 'material' | 'service' | 'project' }) {
   const fields = useFormFields(([state]) => state)
@@ -31,6 +32,7 @@ export function CatalogPreview({ kind }: { kind: 'material' | 'service' | 'proje
     return typeof value === 'string' ? value.trim() : ''
   }
   const samples = (fields.colorSamples?.rows ?? []).slice(0, 8)
+  const inferred = kind === 'material' && !samples.length ? inferredColorSamples(text('colors'), text('description')) : []
 
   return (
     <details className="sp-catalog-preview sp-admin-card" onToggle={(event) => setOpen(event.currentTarget.open)}>
@@ -53,6 +55,12 @@ export function CatalogPreview({ kind }: { kind: 'material' | 'service' | 'proje
               return name && <li key={id}>{/^#[0-9a-f]{6}$/i.test(hex) && <span style={{ backgroundColor: hex }} />}{name}</li>
             })}
           </ul>}
+          {!!inferred.length && <>
+            <small>Przybliżone próbki z opisu kolorów</small>
+            <ul className="sp-preview-samples" aria-label="Przybliżone próbki kolorów">
+              {inferred.map(({ name, hex }) => <li key={name}><span style={{ backgroundColor: hex }} />{name}</li>)}
+            </ul>
+          </>}
           {(fields.glassFiber?.value || fields.carbonFiber?.value) ? <p>{[
             fields.glassFiber?.value && 'Włókno szklane (GF)', fields.carbonFiber?.value && 'Włókno węglowe (CF)',
           ].filter(Boolean).join(', ')}</p> : null}

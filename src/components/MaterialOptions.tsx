@@ -1,6 +1,7 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import type { Material } from '@/lib/types'
+import { materialColorSamples } from '@/lib/material-colors'
 
 export function materialQuoteHref(material: Material, color?: string) {
   const query = new URLSearchParams({ type: 'design' })
@@ -12,7 +13,8 @@ export function materialQuoteHref(material: Material, color?: string) {
 }
 
 export function MaterialOptions({ material }: { material: Material }) {
-  const { colors, colorSamples, glassFiber, carbonFiber } = material
+  const { colors, glassFiber, carbonFiber } = material
+  const colorSamples = materialColorSamples(material)
   const reinforcements = [glassFiber && 'Włókno szklane (GF)', carbonFiber && 'Włókno węglowe (CF)'].filter(Boolean)
 
   return (
@@ -44,6 +46,7 @@ export function MaterialOptions({ material }: { material: Material }) {
                 })}
               </ul>
             )}
+            {!!colorSamples.length && !material.colorSamples?.length && <small>Podgląd przybliżonych kolorów</small>}
           </dd>
         </div>
       )}
